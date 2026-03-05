@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dicionário Local AI</title>
+    <title>Dicionário Local AI - Dual Mode</title>
     <style>
         :root {
             --primary: #4a90e2;
@@ -33,8 +33,10 @@
             margin-bottom: 1rem;
             text-align: center;
         }
-        #transcript-box {
-            min-height: 200px;
+        
+        /* Estilo das Boxes */
+        .display-box {
+            min-height: 150px;
             border: 2px solid #eee;
             padding: 15px;
             border-radius: 10px;
@@ -42,12 +44,26 @@
             margin-bottom: 20px;
             line-height: 1.6;
             overflow-y: auto;
-            max-height: 400px;
+            max-height: 300px;
         }
+
+        /* Box de Digitação */
+        #typing-area {
+            width: 100%;
+            height: 80px;
+            margin-top: 10px;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            font-family: inherit;
+            box-sizing: border-box;
+        }
+
         .controls {
             display: flex;
             gap: 10px;
             justify-content: center;
+            margin-bottom: 20px;
         }
         button {
             padding: 12px 25px;
@@ -63,21 +79,28 @@
         button:disabled { background: #ccc; cursor: not-allowed; }
         .found { color: #28a745; font-weight: bold; }
         .not-found { color: #888; text-decoration: underline dotted; }
+        
+        h3 { margin-top: 0; color: #333; font-size: 1.1rem; }
     </style>
 </head>
 <body>
 
 <div id="app-container">
-    <h2 style="text-align:center">AI Dictation (Offline Mode)</h2>
-    <p id="status">Clique em Iniciar para ditar...</p>
+    <h2 style="text-align:center">AI Dictation & Typing</h2>
     
-    <div id="transcript-box">
-        </div>
-
+    <h3>🎤 Box de Ditado (Voz)</h3>
+    <p id="status">Clique em Iniciar para ditar...</p>
+    <div id="transcript-box" class="display-box"></div>
     <div class="controls">
         <button id="start-btn">Iniciar Ditado</button>
         <button id="stop-btn" disabled>Parar</button>
     </div>
+
+    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+
+    <h3>⌨️ Box de Digitação (Manual)</h3>
+    <div id="typing-result-box" class="display-box"></div>
+    <textarea id="typing-area" placeholder="Comece a digitar aqui para testar o dicionário..."></textarea>
 </div>
 
 <script>
@@ -85,8 +108,11 @@
     const stopBtn = document.getElementById('stop-btn');
     const statusText = document.getElementById('status');
     const transcriptBox = document.getElementById('transcript-box');
+    
+    // Elementos da nova box de digitação
+    const typingArea = document.getElementById('typing-area');
+    const typingResultBox = document.getElementById('typing-result-box');
 
-    // --- FIX IS HERE: Local Vocabulary Array ---
     const ptVocabularyA = [
         "abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", 
         "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", 
@@ -97,8 +123,8 @@
         "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", 
         "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"
     ];
-    // --- END OF FIX ---
 
+    // --- LÓGICA DO DITADO (VOZ) - MANTIDA ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
 
@@ -115,11 +141,10 @@
     recognition.onresult = (event) => {
         const lastIndex = event.results.length - 1;
         const text = event.results[lastIndex][0].transcript.toLowerCase().trim();
-        processInput(text);
+        processInput(text, transcriptBox);
     };
 
     recognition.onerror = (event) => {
-        console.error("Erro de reconhecimento:", event.error);
         statusText.innerText = "❌ Erro: " + event.error;
     };
 
@@ -129,47 +154,52 @@
         stopBtn.disabled = true;
     };
 
-    function processInput(text) {
-        const words = text.split(" ");
+    // --- LÓGICA DE DIGITAÇÃO (MANUAL) - NOVA ---
+    typingArea.addEventListener('input', (e) => {
+        const text = e.target.value.toLowerCase();
+        typingResultBox.innerHTML = ""; // Limpa para processar o texto atualizado
+        processInput(text, typingResultBox, false);
+    });
+
+    // Função de processamento genérica
+    function processInput(text, targetBox, isSpeech = true) {
+        if (!text) {
+            if (!isSpeech) targetBox.innerHTML = "";
+            return;
+        }
+
+        const words = text.split(/\s+/); // Divide por espaços
         let resultHTML = "";
 
         words.forEach(word => {
-            if (ptVocabularyA.includes(word)) {
+            const cleanWord = word.replace(/[.,!?;]/g, ""); // Limpa pontuação básica
+            if (ptVocabularyA.includes(cleanWord)) {
                 resultHTML += `<span class="found">${word}</span> `;
             } else {
                 resultHTML += `<span class="not-found">${word}</span> `;
             }
         });
 
-        transcriptBox.innerHTML += resultHTML + "<br>";
-        transcriptBox.scrollTop = transcriptBox.scrollHeight;
+        if (isSpeech) {
+            targetBox.innerHTML += resultHTML + "<br>";
+            targetBox.scrollTop = targetBox.scrollHeight;
+        } else {
+            targetBox.innerHTML = resultHTML; // Para digitação, substitui o conteúdo
+        }
     }
 
-    // --- FIX IS HERE: Advanced Permission Request ---
     startBtn.onclick = async () => {
         if (window.location.protocol === 'file:') {
-            alert("Atenção: O microfone NÃO funciona abrindo o arquivo diretamente. Use um servidor local ou GitHub Pages.");
-            statusText.innerText = "❌ Use um servidor local (localhost)";
+            alert("Use um servidor local ou GitHub Pages.");
             return;
         }
-
         try {
-            // Solicita permissão explicitamente antes de iniciar
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            
-            // Se chegou aqui, a permissão foi dada
+            await navigator.mediaDevices.getUserMedia({ audio: true });
             recognition.start();
-            
-            // Opcional: Para o stream imediatamente para deixar o recognition assumir
-            stream.getTracks().forEach(track => track.stop());
-            
         } catch (err) {
-            console.error("Permissão de microfone negada:", err);
-            statusText.innerText = "❌ Erro: Permissão de microfone negada.";
-            alert("Por favor, permita o acesso ao microfone nas configurações do navegador (ícone de cadeado).");
+            statusText.innerText = "❌ Erro: Permissão negada.";
         }
     };
-    // --- END OF FIX ---
 
     stopBtn.onclick = () => {
         recognition.stop();
