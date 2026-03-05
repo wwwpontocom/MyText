@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dicionário Local AI - Dual Mode</title>
+    <style>
+        :root {
+            --primary: #4a90e2;
+            --bg: #f5f7fa;
+            --card: #ffffff;
+        }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            margin: 0;
+        }
+        #app-container {
+            background: var(--card);
+            padding: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            width: 95%;
+            max-width: 700px;
+        }
+        #status {
+            color: var(--primary);
+            font-weight: bold;
+            margin-bottom: 1rem;
+            text-align: center;
+        }
+        
+        /* Box 1: Dictation (Static/Non-editable) */
+        #transcript-box {
+            min-height: 150px;
+            border: 2px solid #eee;
+            padding: 15px;
+            border-radius: 10px;
+            background: #fff;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            overflow-y: auto;
+            max-height: 300px;
+        }
+
+        /* Box 2: Editor (Formatting) */
+        .editor-container {
+            margin-top: 20px;
+            border-top: 2px dashed #ccc;
+            padding-top: 20px;
+        }
+        .toolbar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+        .btn-tool {
+            padding: 5px 12px;
+            background: #eee;
+            border: 1px solid #ccc;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        #editor-box {
+            min-height: 200px;
+            border: 2px solid var(--primary);
+            padding: 15px;
+            border-radius: 8px;
+            background: #fff;
+            outline: none;
+        }
+
+        .controls {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+        button {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: transform 0.1s;
+        }
+        button:active { transform: scale(0.95); }
+        #start-btn { background: #28a745; color: white; }
+        #stop-btn { background: #dc3545; color: white; }
+        button:disabled { background: #ccc; cursor: not-allowed; }
+        .found { color: #28a745; font-weight: bold; }
+        .not-found { color: #888; text-decoration: underline dotted; }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <h2 style="text-align:center">AI Dictation & Editor (Dual Mode)</h2>
+    
+    <p id="status">Clique em Iniciar para ditar...</p>
+    
+    <div class="controls">
+        <button id="start-btn">Iniciar Ditado</button>
+        <button id="stop-btn" disabled>Parar</button>
+    </div>
+    <div id="transcript-box"></div>
+
+    <div class="editor-container">
+        <h4 style="margin: 0 0 10px 0">Editor de Texto (Copie do box acima e cole aqui)</h4>
+        <div class="toolbar">
+            <button class="btn-tool" onclick="formatDoc('bold')"><b>B</b></button>
+            <button class="btn-tool" onclick="formatDoc('italic')"><i>I</i></button>
+            <button class="btn-tool" onclick="formatDoc('underline')"><u>U</u></button>
+        </div>
+        <div id="editor-box" contenteditable="true"></div>
+    </div>
+</div>
+
+<script>
+    const startBtn = document.getElementById('start-btn');
+    const stopBtn = document.getElementById('stop-btn');
+    const statusText = document.getElementById('status');
+    const transcriptBox = document.getElementById('transcript-box');
+    const editorBox = document.getElementById('editor-box');
+
+    // Tool function for Editor
+    function formatDoc(cmd) {
+        document.execCommand(cmd, false, null);
+        editorBox.focus();
+    }
+
+    const ptVocabularyA = [
+        "abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", 
+        "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", 
+        "abismo", "abóbora", "abotoar", "abraçar", "abraço", "abranger", 
+        "abrigar", "abrigo", "abril", "absoluto", "absurdo", "abundância", 
+        "acabar", "academia", "acalmar", "acampamento", "ação", "acaso", 
+        "aceitar", "acenar", "acento", "acerto", "aceso", "achar", "acidente", 
+        "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", 
+        "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"
+    ];
+
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+
+    recognition.lang = 'pt-BR';
+    recognition.continuous = true;
+    recognition.interimResults = true;
+
+    recognition.onstart = () => {
+        statusText.innerText = "🎤 Ouvindo...";
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+    };
+
+    recognition.onresult = (event) => {
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+            if (event.results[i].isFinal) {
+                let finalTranscript = event.results[i][0].transcript.toLowerCase().trim();
+                processInput(finalTranscript);
+            }
+        }
+    };
+
+    recognition.onerror = (event) => {
+        statusText.innerText = "❌ Erro: " + event.error;
+        stopDictation();
+    };
+
+    recognition.onend = () => {
+        stopDictation();
+    };
+
+    function processInput(text) {
+        const words = text.split(" ");
+        let resultHTML = "";
+
+        words.forEach(word => {
+            if (ptVocabularyA.includes(word)) {
+                resultHTML += `<span class="found">${word}</span> `;
+            } else {
+                resultHTML += `<span class="not-found">${word}</span> `;
+            }
+        });
+
+        transcriptBox.innerHTML += resultHTML + "<br>";
+        transcriptBox.scrollTop = transcriptBox.scrollHeight;
+    }
+
+    function stopDictation() {
+        recognition.stop();
+        statusText.innerText = "Ditado pausado.";
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+    }
+
+    startBtn.onclick = async () => {
+        if (window.location.protocol === 'file:') {
+            alert("Abra via Servidor Local ou GitHub Pages!");
+            return;
+        }
+
+        try {
+            await navigator.mediaDevices.getUserMedia({ audio: true });
+            recognition.start();
+        } catch (err) {
+            statusText.innerText = "❌ Sem acesso ao microfone.";
+        }
+    };
+
+    stopBtn.onclick = () => {
+        stopDictation();
+    };
+</script>
+
+</body>
+</html>
