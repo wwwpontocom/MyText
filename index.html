@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dicionário Local AI - Dual Mode</title>
+    <title>Dicionário Local AI</title>
     <style>
         :root {
             --primary: #4a90e2;
@@ -25,7 +25,7 @@
             border-radius: 15px;
             box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             width: 95%;
-            max-width: 700px;
+            max-width: 600px;
         }
         #status {
             color: var(--primary);
@@ -33,9 +33,8 @@
             margin-bottom: 1rem;
             text-align: center;
         }
-        
         #transcript-box {
-            min-height: 150px;
+            min-height: 200px;
             border: 2px solid #eee;
             padding: 15px;
             border-radius: 10px;
@@ -43,40 +42,12 @@
             margin-bottom: 20px;
             line-height: 1.6;
             overflow-y: auto;
-            max-height: 300px;
+            max-height: 400px;
         }
-
-        .editor-container {
-            margin-top: 20px;
-            border-top: 2px dashed #ccc;
-            padding-top: 20px;
-        }
-        .toolbar {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 5px;
-        }
-        .btn-tool {
-            padding: 5px 12px;
-            background: #eee;
-            border: 1px solid #ccc;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-        #editor-box {
-            min-height: 200px;
-            border: 2px solid var(--primary);
-            padding: 15px;
-            border-radius: 8px;
-            background: #fff;
-            outline: none;
-        }
-
         .controls {
             display: flex;
             gap: 10px;
             justify-content: center;
-            margin-bottom: 10px;
         }
         button {
             padding: 12px 25px;
@@ -97,24 +68,15 @@
 <body>
 
 <div id="app-container">
-    <h2 style="text-align:center">AI Dictation & Editor (Dual Mode)</h2>
-    
+    <h2 style="text-align:center">AI Dictation (Offline Mode)</h2>
     <p id="status">Clique em Iniciar para ditar...</p>
     
+    <div id="transcript-box">
+        </div>
+
     <div class="controls">
         <button id="start-btn">Iniciar Ditado</button>
         <button id="stop-btn" disabled>Parar</button>
-    </div>
-    <div id="transcript-box"></div>
-
-    <div class="editor-container">
-        <h4 style="margin: 0 0 10px 0">Editor de Texto (Copie e cole aqui)</h4>
-        <div class="toolbar">
-            <button class="btn-tool" onclick="formatDoc('bold')"><b>B</b></button>
-            <button class="btn-tool" onclick="formatDoc('italic')"><i>I</i></button>
-            <button class="btn-tool" onclick="formatDoc('underline')"><u>U</u></button>
-        </div>
-        <div id="editor-box" contenteditable="true"></div>
     </div>
 </div>
 
@@ -123,95 +85,96 @@
     const stopBtn = document.getElementById('stop-btn');
     const statusText = document.getElementById('status');
     const transcriptBox = document.getElementById('transcript-box');
-    const editorBox = document.getElementById('editor-box');
 
-    function formatDoc(cmd) {
-        document.execCommand(cmd, false, null);
-        editorBox.focus();
-    }
-
-    const ptVocabularyA = ["abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", "abismo", "abóbora", "abotoar", "abraçar", "abraço", "abranger", "abrigar", "abrigo", "abril", "absoluto", "absurdo", "abundância", "acabar", "academia", "acalmar", "acampamento", "ação", "acaso", "aceitar", "acenar", "acento", "acerto", "aceso", "achar", "acidente", "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"];
+    // --- FIX IS HERE: Local Vocabulary Array ---
+    const ptVocabularyA = [
+        "abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", 
+        "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", 
+        "abismo", "abóbora", "abotoar", "abraçar", "abraço", "abranger", 
+        "abrigar", "abrigo", "abril", "absoluto", "absurdo", "abundância", 
+        "acabar", "academia", "acalmar", "acampamento", "ação", "acaso", 
+        "aceitar", "acenar", "acento", "acerto", "aceso", "achar", "acidente", 
+        "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", 
+        "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"
+    ];
+    // --- END OF FIX ---
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    let recognition = null;
-    let isActive = false;
+    const recognition = new SpeechRecognition();
 
-    function initRecognition() {
-        recognition = new SpeechRecognition();
-        recognition.lang = 'pt-BR';
-        recognition.continuous = true;
-        recognition.interimResults = true; // --- FIX: Habilitado para captação imediata ---
+    recognition.lang = 'pt-BR';
+    recognition.continuous = true;
+    recognition.interimResults = false;
 
-        recognition.onstart = () => {
-            statusText.innerText = "🎤 Microfone Ativo: Pode falar...";
-            startBtn.disabled = true;
-            stopBtn.disabled = false;
-            isActive = true;
-        };
+    recognition.onstart = () => {
+        statusText.innerText = "🎤 Ouvindo...";
+        startBtn.disabled = true;
+        stopBtn.disabled = false;
+    };
 
-        recognition.onresult = (event) => {
-            let finalTranscript = '';
-            for (let i = event.resultIndex; i < event.results.length; ++i) {
-                if (event.results[i].isFinal) {
-                    finalTranscript += event.results[i][0].transcript;
-                }
-            }
-            if (finalTranscript !== '') {
-                processInput(finalTranscript.toLowerCase().trim());
-            }
-        };
+    recognition.onresult = (event) => {
+        const lastIndex = event.results.length - 1;
+        const text = event.results[lastIndex][0].transcript.toLowerCase().trim();
+        processInput(text);
+    };
 
-        recognition.onerror = (event) => {
-            console.error("Erro no reconhecimento:", event.error);
-            if (event.error === 'no-speech') return; // Ignora se for apenas silêncio
-            statusText.innerText = "❌ Erro: " + event.error;
-            stopDictation();
-        };
+    recognition.onerror = (event) => {
+        console.error("Erro de reconhecimento:", event.error);
+        statusText.innerText = "❌ Erro: " + event.error;
+    };
 
-        recognition.onend = () => {
-            if (isActive) {
-                recognition.start(); // Reinicia se não foi parado manualmente
-            } else {
-                statusText.innerText = "Ditado parado.";
-            }
-        };
-    }
+    recognition.onend = () => {
+        statusText.innerText = "Ditado pausado.";
+        startBtn.disabled = false;
+        stopBtn.disabled = true;
+    };
 
     function processInput(text) {
-        const words = text.split(/\s+/);
-        let resultHTML = "<div>";
+        const words = text.split(" ");
+        let resultHTML = "";
+
         words.forEach(word => {
-            const cleanWord = word.replace(/[.,!?;]/g, "");
-            resultHTML += ptVocabularyA.includes(cleanWord) ? `<span class="found">${word}</span> ` : `<span class="not-found">${word}</span> `;
+            if (ptVocabularyA.includes(word)) {
+                resultHTML += `<span class="found">${word}</span> `;
+            } else {
+                resultHTML += `<span class="not-found">${word}</span> `;
+            }
         });
-        resultHTML += "</div>";
-        transcriptBox.innerHTML += resultHTML;
+
+        transcriptBox.innerHTML += resultHTML + "<br>";
         transcriptBox.scrollTop = transcriptBox.scrollHeight;
     }
 
-    function stopDictation() {
-        isActive = false;
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-        if (recognition) recognition.stop();
-    }
-
+    // --- FIX IS HERE: Advanced Permission Request ---
     startBtn.onclick = async () => {
-        if (!SpeechRecognition) {
-            alert("Navegador não suportado.");
+        if (window.location.protocol === 'file:') {
+            alert("Atenção: O microfone NÃO funciona abrindo o arquivo diretamente. Use um servidor local ou GitHub Pages.");
+            statusText.innerText = "❌ Use um servidor local (localhost)";
             return;
         }
 
         try {
-            await navigator.mediaDevices.getUserMedia({ audio: true });
-            if (!recognition) initRecognition();
+            // Solicita permissão explicitamente antes de iniciar
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            
+            // Se chegou aqui, a permissão foi dada
             recognition.start();
+            
+            // Opcional: Para o stream imediatamente para deixar o recognition assumir
+            stream.getTracks().forEach(track => track.stop());
+            
         } catch (err) {
-            statusText.innerText = "❌ Sem permissão de áudio.";
+            console.error("Permissão de microfone negada:", err);
+            statusText.innerText = "❌ Erro: Permissão de microfone negada.";
+            alert("Por favor, permita o acesso ao microfone nas configurações do navegador (ícone de cadeado).");
         }
     };
+    // --- END OF FIX ---
 
-    stopBtn.onclick = stopDictation;
+    stopBtn.onclick = () => {
+        recognition.stop();
+    };
+
 </script>
 
 </body>
