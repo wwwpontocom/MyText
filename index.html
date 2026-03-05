@@ -34,7 +34,6 @@
             text-align: center;
         }
         
-        /* Box 1: Dictation (Static/Non-editable) */
         #transcript-box {
             min-height: 150px;
             border: 2px solid #eee;
@@ -47,7 +46,6 @@
             max-height: 300px;
         }
 
-        /* Box 2: Editor (Formatting) */
         .editor-container {
             margin-top: 20px;
             border-top: 2px dashed #ccc;
@@ -97,7 +95,6 @@
     </style>
 </head>
 <body>
-    
 
 <div id="app-container">
     <h2 style="text-align:center">AI Dictation & Editor (Dual Mode)</h2>
@@ -128,80 +125,78 @@
     const transcriptBox = document.getElementById('transcript-box');
     const editorBox = document.getElementById('editor-box');
 
-    // Tool function for Editor
     function formatDoc(cmd) {
         document.execCommand(cmd, false, null);
         editorBox.focus();
     }
 
-    const ptVocabularyA = [
-        "abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", 
-        "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", 
-        "abismo", "abóbora", "abotoar", "abraçar", "abraço", "abranger", 
-        "abrigar", "abrigo", "abril", "absoluto", "absurdo", "abundância", 
-        "acabar", "academia", "acalmar", "acampamento", "ação", "acaso", 
-        "aceitar", "acenar", "acento", "acerto", "aceso", "achar", "acidente", 
-        "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", 
-        "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"
-    ];
+    const ptVocabularyA = ["abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", "abismo", "abóbora", "abotoar", "abraçar", "abraço", "abranger", "abrigar", "abrigo", "abril", "absoluto", "absurdo", "abundância", "acabar", "academia", "acalmar", "acampamento", "ação", "acaso", "aceitar", "acenar", "acento", "acerto", "aceso", "achar", "acidente", "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"];
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
+    let recognition = null;
 
-    recognition.lang = 'pt-BR';
-    recognition.continuous = true;
-    recognition.interimResults = true;
+    if (SpeechRecognition) {
+        recognition = new SpeechRecognition();
+        recognition.lang = 'pt-BR';
+        recognition.continuous = true;
+        recognition.interimResults = false;
 
-    recognition.onstart = () => {
-        statusText.innerText = "🎤 Ouvindo...";
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-    };
+        recognition.onstart = () => {
+            statusText.innerText = "🎤 Ouvindo...";
+            startBtn.disabled = true;
+            stopBtn.disabled = false;
+        };
 
-    recognition.onresult = (event) => {
-        for (let i = event.resultIndex; i < event.results.length; ++i) {
-            if (event.results[i].isFinal) {
-                let finalTranscript = event.results[i][0].transcript.toLowerCase().trim();
-                processInput(finalTranscript);
+        recognition.onresult = (event) => {
+            let finalTranscript = '';
+            for (let i = event.resultIndex; i < event.results.length; ++i) {
+                if (event.results[i].isFinal) {
+                    finalTranscript = event.results[i][0].transcript.toLowerCase().trim();
+                    processInput(finalTranscript);
+                }
             }
-        }
-    };
+        };
 
-    recognition.onerror = (event) => {
-        statusText.innerText = "❌ Erro: " + event.error;
-        stopDictation();
-    };
+        recognition.onerror = (event) => {
+            statusText.innerText = "❌ Erro: " + event.error;
+            stopDictation();
+        };
 
-    recognition.onend = () => {
-        stopDictation();
-    };
+        recognition.onend = () => {
+            // Se o botão start estiver habilitado, significa que paramos propositalmente ou por erro
+            if (startBtn.disabled) {
+                recognition.start(); // Reinicia automaticamente se ainda deve estar ouvindo
+            } else {
+                statusText.innerText = "Ditado parado.";
+            }
+        };
+    }
 
     function processInput(text) {
         const words = text.split(" ");
         let resultHTML = "";
-
         words.forEach(word => {
-            if (ptVocabularyA.includes(word)) {
-                resultHTML += `<span class="found">${word}</span> `;
-            } else {
-                resultHTML += `<span class="not-found">${word}</span> `;
-            }
+            resultHTML += ptVocabularyA.includes(word) ? `<span class="found">${word}</span> ` : `<span class="not-found">${word}</span> `;
         });
-
         transcriptBox.innerHTML += resultHTML + "<br>";
         transcriptBox.scrollTop = transcriptBox.scrollHeight;
     }
 
     function stopDictation() {
-        recognition.stop();
-        statusText.innerText = "Ditado pausado.";
         startBtn.disabled = false;
         stopBtn.disabled = true;
+        if (recognition) recognition.stop();
     }
 
+    // --- FIX IS HERE: Refined Start Logic ---
     startBtn.onclick = async () => {
+        if (!SpeechRecognition) {
+            alert("Seu navegador não suporta reconhecimento de fala.");
+            return;
+        }
+        
         if (window.location.protocol === 'file:') {
-            alert("Abra via Servidor Local ou GitHub Pages!");
+            alert("Erro: O microfone requer um servidor (Live Server ou GitHub Pages).");
             return;
         }
 
@@ -209,13 +204,11 @@
             await navigator.mediaDevices.getUserMedia({ audio: true });
             recognition.start();
         } catch (err) {
-            statusText.innerText = "❌ Sem acesso ao microfone.";
+            statusText.innerText = "❌ Microfone bloqueado ou não encontrado.";
         }
     };
 
-    stopBtn.onclick = () => {
-        stopDictation();
-    };
+    stopBtn.onclick = stopDictation;
 </script>
 
 </body>
