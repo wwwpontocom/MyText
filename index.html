@@ -44,7 +44,6 @@
             line-height: 1.6;
             overflow-y: auto;
             max-height: 300px;
-            white-space: normal;
         }
 
         .editor-container {
@@ -135,69 +134,63 @@
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
-    let isStoppingIndividually = false;
+    let isActive = false;
 
-    if (SpeechRecognition) {
+    function initRecognition() {
         recognition = new SpeechRecognition();
         recognition.lang = 'pt-BR';
         recognition.continuous = true;
-        recognition.interimResults = false;
+        recognition.interimResults = true; // --- FIX: Habilitado para captação imediata ---
 
         recognition.onstart = () => {
-            statusText.innerText = "🎤 Ouvindo agora... Fale algo.";
+            statusText.innerText = "🎤 Microfone Ativo: Pode falar...";
             startBtn.disabled = true;
             stopBtn.disabled = false;
-            isStoppingIndividually = false;
+            isActive = true;
         };
 
-        // --- FIX IS HERE: Garante captura robusta do resultado ---
         recognition.onresult = (event) => {
-            let resultText = "";
+            let finalTranscript = '';
             for (let i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
-                    resultText = event.results[i][0].transcript;
-                    processInput(resultText.toLowerCase().trim());
+                    finalTranscript += event.results[i][0].transcript;
                 }
+            }
+            if (finalTranscript !== '') {
+                processInput(finalTranscript.toLowerCase().trim());
             }
         };
 
         recognition.onerror = (event) => {
-            console.error("Speech Recognition Error:", event.error);
-            if (event.error !== 'no-speech') {
-                statusText.innerText = "❌ Erro: " + event.error;
-                stopDictation();
-            }
+            console.error("Erro no reconhecimento:", event.error);
+            if (event.error === 'no-speech') return; // Ignora se for apenas silêncio
+            statusText.innerText = "❌ Erro: " + event.error;
+            stopDictation();
         };
 
         recognition.onend = () => {
-            if (!isStoppingIndividually) {
-                try {
-                    recognition.start();
-                } catch (e) {
-                    console.log("Aguardando reinício...");
-                }
+            if (isActive) {
+                recognition.start(); // Reinicia se não foi parado manualmente
             } else {
-                statusText.innerText = "Ditado finalizado.";
+                statusText.innerText = "Ditado parado.";
             }
         };
     }
 
     function processInput(text) {
-        if (!text) return;
         const words = text.split(/\s+/);
-        let resultHTML = "";
+        let resultHTML = "<div>";
         words.forEach(word => {
             const cleanWord = word.replace(/[.,!?;]/g, "");
             resultHTML += ptVocabularyA.includes(cleanWord) ? `<span class="found">${word}</span> ` : `<span class="not-found">${word}</span> `;
         });
-        
-        // Adiciona ao topo ou final conforme sua preferência (aqui mantivemos final)
-        transcriptBox.innerHTML += `<div>${resultHTML}</div>`;
+        resultHTML += "</div>";
+        transcriptBox.innerHTML += resultHTML;
         transcriptBox.scrollTop = transcriptBox.scrollHeight;
     }
 
     function stopDictation() {
-        isStoppingIndividually = true;
+        isActive = false;
         startBtn.disabled = false;
         stopBtn.disabled = true;
         if (recognition) recognition.stop();
@@ -208,13 +201,13 @@
             alert("Navegador não suportado.");
             return;
         }
-        
+
         try {
-            // Garante permissão antes de iniciar o objeto
             await navigator.mediaDevices.getUserMedia({ audio: true });
+            if (!recognition) initRecognition();
             recognition.start();
         } catch (err) {
-            statusText.innerText = "❌ Falha no microfone: Verifique permissões.";
+            statusText.innerText = "❌ Sem permissão de áudio.";
         }
     };
 
