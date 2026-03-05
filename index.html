@@ -44,6 +44,7 @@
             line-height: 1.6;
             overflow-y: auto;
             max-height: 300px;
+            white-space: normal;
         }
 
         .editor-container {
@@ -108,7 +109,7 @@
     <div id="transcript-box"></div>
 
     <div class="editor-container">
-        <h4 style="margin: 0 0 10px 0">Editor de Texto (Copie do box acima e cole aqui)</h4>
+        <h4 style="margin: 0 0 10px 0">Editor de Texto (Copie e cole aqui)</h4>
         <div class="toolbar">
             <button class="btn-tool" onclick="formatDoc('bold')"><b>B</b></button>
             <button class="btn-tool" onclick="formatDoc('italic')"><i>I</i></button>
@@ -134,6 +135,7 @@
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     let recognition = null;
+    let isStoppingIndividually = false;
 
     if (SpeechRecognition) {
         recognition = new SpeechRecognition();
@@ -142,69 +144,77 @@
         recognition.interimResults = false;
 
         recognition.onstart = () => {
-            statusText.innerText = "🎤 Ouvindo...";
+            statusText.innerText = "🎤 Ouvindo agora... Fale algo.";
             startBtn.disabled = true;
             stopBtn.disabled = false;
+            isStoppingIndividually = false;
         };
 
+        // --- FIX IS HERE: Garante captura robusta do resultado ---
         recognition.onresult = (event) => {
-            let finalTranscript = '';
+            let resultText = "";
             for (let i = event.resultIndex; i < event.results.length; ++i) {
                 if (event.results[i].isFinal) {
-                    finalTranscript = event.results[i][0].transcript.toLowerCase().trim();
-                    processInput(finalTranscript);
+                    resultText = event.results[i][0].transcript;
+                    processInput(resultText.toLowerCase().trim());
                 }
             }
         };
 
         recognition.onerror = (event) => {
-            statusText.innerText = "❌ Erro: " + event.error;
-            stopDictation();
+            console.error("Speech Recognition Error:", event.error);
+            if (event.error !== 'no-speech') {
+                statusText.innerText = "❌ Erro: " + event.error;
+                stopDictation();
+            }
         };
 
         recognition.onend = () => {
-            // Se o botão start estiver habilitado, significa que paramos propositalmente ou por erro
-            if (startBtn.disabled) {
-                recognition.start(); // Reinicia automaticamente se ainda deve estar ouvindo
+            if (!isStoppingIndividually) {
+                try {
+                    recognition.start();
+                } catch (e) {
+                    console.log("Aguardando reinício...");
+                }
             } else {
-                statusText.innerText = "Ditado parado.";
+                statusText.innerText = "Ditado finalizado.";
             }
         };
     }
 
     function processInput(text) {
-        const words = text.split(" ");
+        if (!text) return;
+        const words = text.split(/\s+/);
         let resultHTML = "";
         words.forEach(word => {
-            resultHTML += ptVocabularyA.includes(word) ? `<span class="found">${word}</span> ` : `<span class="not-found">${word}</span> `;
+            const cleanWord = word.replace(/[.,!?;]/g, "");
+            resultHTML += ptVocabularyA.includes(cleanWord) ? `<span class="found">${word}</span> ` : `<span class="not-found">${word}</span> `;
         });
-        transcriptBox.innerHTML += resultHTML + "<br>";
+        
+        // Adiciona ao topo ou final conforme sua preferência (aqui mantivemos final)
+        transcriptBox.innerHTML += `<div>${resultHTML}</div>`;
         transcriptBox.scrollTop = transcriptBox.scrollHeight;
     }
 
     function stopDictation() {
+        isStoppingIndividually = true;
         startBtn.disabled = false;
         stopBtn.disabled = true;
         if (recognition) recognition.stop();
     }
 
-    // --- FIX IS HERE: Refined Start Logic ---
     startBtn.onclick = async () => {
         if (!SpeechRecognition) {
-            alert("Seu navegador não suporta reconhecimento de fala.");
+            alert("Navegador não suportado.");
             return;
         }
         
-        if (window.location.protocol === 'file:') {
-            alert("Erro: O microfone requer um servidor (Live Server ou GitHub Pages).");
-            return;
-        }
-
         try {
+            // Garante permissão antes de iniciar o objeto
             await navigator.mediaDevices.getUserMedia({ audio: true });
             recognition.start();
         } catch (err) {
-            statusText.innerText = "❌ Microfone bloqueado ou não encontrado.";
+            statusText.innerText = "❌ Falha no microfone: Verifique permissões.";
         }
     };
 
