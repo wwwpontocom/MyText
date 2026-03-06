@@ -160,9 +160,8 @@
         stopBtn.disabled = false;
     };
 
-    // --- FIX IS HERE: Spelling logic function ---
     function handleSpelling(text) {
-        const tokens = text.replace("soletrar", "").trim().split(/\s+/);
+        const tokens = text.trim().split(/\s+/);
         let word = "";
         let makeUpper = false;
 
@@ -177,28 +176,42 @@
         });
         return word;
     }
-    // --- END OF FIX ---
 
     recognition.onresult = (event) => {
         const lastIndex = event.results.length - 1;
-        let text = event.results[lastIndex][0].transcript.toLowerCase().trim();
+        let originalText = event.results[lastIndex][0].transcript.toLowerCase().trim();
         
-        if (text === "novo parágrafo" || text === "nova linha") {
+        if (originalText === "novo parágrafo" || originalText === "nova linha") {
             transcriptBox.innerHTML += "<br><br>";
             return;
         }
 
-        // --- FIX IS HERE: Check for 'soletrar' command ---
-        if (text.startsWith("soletrar")) {
-            text = handleSpelling(text);
+        // --- FIX IS HERE: Mid-sentence "comando soletrar" detection ---
+        let processedText = "";
+        const trigger = "comando soletrar";
+        
+        if (originalText.includes(trigger)) {
+            const parts = originalText.split(trigger);
+            // Parte 1: Texto normal antes do comando
+            let normalPart = parts[0].trim();
+            for (const [key, value] of Object.entries(punctuationMap)) {
+                normalPart = normalPart.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
+            }
+            
+            // Parte 2: Texto soletrado após o comando
+            let spelledPart = handleSpelling(parts[1]);
+            
+            processedText = (normalPart ? normalPart + " " : "") + spelledPart;
+        } else {
+            // Ditado normal caso não haja o comando
+            processedText = originalText;
+            for (const [key, value] of Object.entries(punctuationMap)) {
+                processedText = processedText.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
+            }
         }
         // --- END OF FIX ---
-
-        for (const [key, value] of Object.entries(punctuationMap)) {
-            text = text.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
-        }
         
-        processInput(text, transcriptBox, true);
+        processInput(processedText, transcriptBox, true);
     };
 
     recognition.onerror = (event) => {
