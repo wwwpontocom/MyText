@@ -44,7 +44,6 @@
             overflow-y: auto;
             max-height: 300px;
         }
-        /* Estilo para a nova área de digitação rica */
         #typing-input {
             width: 100%;
             min-height: 100px;
@@ -135,9 +134,10 @@
         "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"
     ];
 
-    // Mapeamento de pontuação para o ditado
+    // Mapeamento de pontuação expandido
     const punctuationMap = {
         "vírgula": ",",
+        "ponto final": ".",
         "ponto": ".",
         "dois pontos": ":",
         "aspas": '"',
@@ -165,7 +165,13 @@
         const lastIndex = event.results.length - 1;
         let text = event.results[lastIndex][0].transcript.toLowerCase().trim();
         
-        // --- FIX IS HERE: Punctuation Handling ---
+        // --- FIX IS HERE: Special Command "Novo Parágrafo" ---
+        if (text === "novo parágrafo" || text === "nova linha") {
+            transcriptBox.innerHTML += "<br><br>";
+            return;
+        }
+
+        // Pontuação
         for (const [key, value] of Object.entries(punctuationMap)) {
             text = text.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
         }
@@ -183,18 +189,18 @@
         stopBtn.disabled = true;
     };
 
-    // --- FIX IS HERE: Rich Typing Box Logic ---
     typingInput.oninput = () => {
         const text = typingInput.innerText.toLowerCase();
         processInput(text, typingDisplay, false);
     };
 
     function processInput(text, targetBox, append) {
+        if (!text) return;
         const words = text.split(/\s+/);
         let resultHTML = "";
 
         words.forEach(word => {
-            const cleanWord = word.replace(/[.,!?;:"]/g, ""); // Incluído : e " na limpeza
+            const cleanWord = word.replace(/[.,!?;:"]/g, "");
             if (ptVocabularyA.includes(cleanWord)) {
                 resultHTML += `<span class="found">${word}</span> `;
             } else {
@@ -203,7 +209,7 @@
         });
 
         if (append) {
-            targetBox.innerHTML += resultHTML + "<br>";
+            targetBox.innerHTML += resultHTML + " ";
             targetBox.scrollTop = targetBox.scrollHeight;
         } else {
             targetBox.innerHTML = resultHTML;
