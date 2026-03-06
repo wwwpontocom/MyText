@@ -34,7 +34,7 @@
             text-align: center;
         }
         .display-box {
-            min-height: 200px; /* Aumentada para ser a box única */
+            min-height: 150px;
             border: 2px solid #eee;
             padding: 15px;
             border-radius: 10px;
@@ -42,11 +42,11 @@
             margin-bottom: 20px;
             line-height: 1.6;
             overflow-y: auto;
-            max-height: 400px;
+            max-height: 300px;
         }
         #typing-input {
             width: 100%;
-            min-height: 80px;
+            min-height: 100px;
             margin-top: 5px;
             padding: 12px;
             border: 2px solid #ddd;
@@ -72,7 +72,6 @@
             display: flex;
             gap: 10px;
             justify-content: center;
-            margin-bottom: 20px;
         }
         button {
             padding: 12px 25px;
@@ -96,17 +95,15 @@
 <div id="app-container">
     <h2 style="text-align:center">AI Dictation & Typing</h2>
     
-    <p id="status">Clique em Iniciar para ditar ou digite abaixo...</p>
-    
-    <h3>📄 Resultado (Voz e Teclado)</h3>
-    <div id="typing-display" class="display-box"></div>
-
+    <h3>🎤 Ditado por Voz</h3>
+    <p id="status">Clique em Iniciar para ditar...</p>
+    <div id="transcript-box" class="display-box"></div>
     <div class="controls">
         <button id="start-btn">Iniciar Ditado</button>
         <button id="stop-btn" disabled>Parar</button>
     </div>
 
-    <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
     <h3>⌨️ Digitação Manual</h3>
     <div class="toolbar">
@@ -114,6 +111,7 @@
         <button class="btn-tool" onclick="execCmd('italic')"><i>I</i></button>
         <button class="btn-tool" onclick="execCmd('underline')"><u>U</u></button>
     </div>
+    <div id="typing-display" class="display-box"></div>
     <div id="typing-input" contenteditable="true"></div>
 </div>
 
@@ -121,6 +119,7 @@
     const startBtn = document.getElementById('start-btn');
     const stopBtn = document.getElementById('stop-btn');
     const statusText = document.getElementById('status');
+    const transcriptBox = document.getElementById('transcript-box');
     const typingInput = document.getElementById('typing-input');
     const typingDisplay = document.getElementById('typing-display');
 
@@ -135,6 +134,7 @@
         "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"
     ];
 
+    // Mapeamento de pontuação expandido
     const punctuationMap = {
         "vírgula": ",",
         "ponto final": ".",
@@ -165,9 +165,9 @@
         const lastIndex = event.results.length - 1;
         let text = event.results[lastIndex][0].transcript.toLowerCase().trim();
         
-        // Comando especial novo parágrafo
+        // --- FIX IS HERE: Special Command "Novo Parágrafo" ---
         if (text === "novo parágrafo" || text === "nova linha") {
-            typingDisplay.innerHTML += "<br><br>";
+            transcriptBox.innerHTML += "<br><br>";
             return;
         }
 
@@ -176,8 +176,7 @@
             text = text.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
         }
         
-        // --- FIX IS HERE: Dictation now goes to typingDisplay ---
-        processInput(text, typingDisplay, true);
+        processInput(text, transcriptBox, true);
     };
 
     recognition.onerror = (event) => {
@@ -192,15 +191,11 @@
 
     typingInput.oninput = () => {
         const text = typingInput.innerText.toLowerCase();
-        // Digitação substitui ou adiciona conforme sua preferência, aqui mantemos a lógica anterior
         processInput(text, typingDisplay, false);
     };
 
     function processInput(text, targetBox, append) {
-        if (!text && !append) {
-            targetBox.innerHTML = "";
-            return;
-        }
+        if (!text) return;
         const words = text.split(/\s+/);
         let resultHTML = "";
 
@@ -227,8 +222,9 @@
             return;
         }
         try {
-            await navigator.mediaDevices.getUserMedia({ audio: true });
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             recognition.start();
+            stream.getTracks().forEach(track => track.stop());
         } catch (err) {
             statusText.innerText = "❌ Erro: Permissão negada.";
         }
