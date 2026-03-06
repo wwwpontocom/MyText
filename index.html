@@ -33,8 +33,8 @@
             margin-bottom: 1rem;
             text-align: center;
         }
-        #transcript-box {
-            min-height: 200px;
+        .display-box {
+            min-height: 150px;
             border: 2px solid #eee;
             padding: 15px;
             border-radius: 10px;
@@ -42,7 +42,18 @@
             margin-bottom: 20px;
             line-height: 1.6;
             overflow-y: auto;
-            max-height: 400px;
+            max-height: 300px;
+        }
+        #typing-input {
+            width: 100%;
+            height: 80px;
+            margin-top: 10px;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            box-sizing: border-box;
+            resize: vertical;
         }
         .controls {
             display: flex;
@@ -63,21 +74,27 @@
         button:disabled { background: #ccc; cursor: not-allowed; }
         .found { color: #28a745; font-weight: bold; }
         .not-found { color: #888; text-decoration: underline dotted; }
+        h3 { margin: 10px 0; color: #333; }
     </style>
 </head>
 <body>
 
 <div id="app-container">
-    <h2 style="text-align:center">AI Dictation (Offline Mode)</h2>
-    <p id="status">Clique em Iniciar para ditar...</p>
+    <h2 style="text-align:center">AI Dictation & Typing</h2>
     
-    <div id="transcript-box">
-        </div>
-
+    <h3>🎤 Ditado por Voz</h3>
+    <p id="status">Clique em Iniciar para ditar...</p>
+    <div id="transcript-box" class="display-box"></div>
     <div class="controls">
         <button id="start-btn">Iniciar Ditado</button>
         <button id="stop-btn" disabled>Parar</button>
     </div>
+
+    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+
+    <h3>⌨️ Digitação Manual</h3>
+    <div id="typing-display" class="display-box"></div>
+    <textarea id="typing-input" placeholder="Digite algo aqui..."></textarea>
 </div>
 
 <script>
@@ -85,8 +102,9 @@
     const stopBtn = document.getElementById('stop-btn');
     const statusText = document.getElementById('status');
     const transcriptBox = document.getElementById('transcript-box');
+    const typingInput = document.getElementById('typing-input');
+    const typingDisplay = document.getElementById('typing-display');
 
-    // --- FIX IS HERE: Local Vocabulary Array ---
     const ptVocabularyA = [
         "abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", 
         "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", 
@@ -97,11 +115,10 @@
         "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", 
         "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"
     ];
-    // --- END OF FIX ---
 
+    // Lógica do Reconhecimento de Voz (Mantida conforme solicitado)
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
-
     recognition.lang = 'pt-BR';
     recognition.continuous = true;
     recognition.interimResults = false;
@@ -115,11 +132,10 @@
     recognition.onresult = (event) => {
         const lastIndex = event.results.length - 1;
         const text = event.results[lastIndex][0].transcript.toLowerCase().trim();
-        processInput(text);
+        processInput(text, transcriptBox, true);
     };
 
     recognition.onerror = (event) => {
-        console.error("Erro de reconhecimento:", event.error);
         statusText.innerText = "❌ Erro: " + event.error;
     };
 
@@ -129,52 +145,51 @@
         stopBtn.disabled = true;
     };
 
-    function processInput(text) {
-        const words = text.split(" ");
+    // --- FIX IS HERE: Typing Box Logic ---
+    typingInput.oninput = () => {
+        const text = typingInput.value.toLowerCase();
+        processInput(text, typingDisplay, false);
+    };
+    // --- END OF FIX ---
+
+    function processInput(text, targetBox, append) {
+        const words = text.split(/\s+/);
         let resultHTML = "";
 
         words.forEach(word => {
-            if (ptVocabularyA.includes(word)) {
+            const cleanWord = word.replace(/[.,!?;]/g, "");
+            if (ptVocabularyA.includes(cleanWord)) {
                 resultHTML += `<span class="found">${word}</span> `;
             } else {
                 resultHTML += `<span class="not-found">${word}</span> `;
             }
         });
 
-        transcriptBox.innerHTML += resultHTML + "<br>";
-        transcriptBox.scrollTop = transcriptBox.scrollHeight;
+        if (append) {
+            targetBox.innerHTML += resultHTML + "<br>";
+            targetBox.scrollTop = targetBox.scrollHeight;
+        } else {
+            targetBox.innerHTML = resultHTML;
+        }
     }
 
-    // --- FIX IS HERE: Advanced Permission Request ---
     startBtn.onclick = async () => {
         if (window.location.protocol === 'file:') {
-            alert("Atenção: O microfone NÃO funciona abrindo o arquivo diretamente. Use um servidor local ou GitHub Pages.");
-            statusText.innerText = "❌ Use um servidor local (localhost)";
+            alert("Atenção: O microfone NÃO funciona via file://. Use um servidor local.");
             return;
         }
-
         try {
-            // Solicita permissão explicitamente antes de iniciar
             const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-            
-            // Se chegou aqui, a permissão foi dada
             recognition.start();
-            
-            // Opcional: Para o stream imediatamente para deixar o recognition assumir
             stream.getTracks().forEach(track => track.stop());
-            
         } catch (err) {
-            console.error("Permissão de microfone negada:", err);
-            statusText.innerText = "❌ Erro: Permissão de microfone negada.";
-            alert("Por favor, permita o acesso ao microfone nas configurações do navegador (ícone de cadeado).");
+            statusText.innerText = "❌ Erro: Permissão negada.";
         }
     };
-    // --- END OF FIX ---
 
     stopBtn.onclick = () => {
         recognition.stop();
     };
-
 </script>
 
 </body>
