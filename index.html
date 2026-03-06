@@ -44,16 +44,30 @@
             overflow-y: auto;
             max-height: 300px;
         }
+        /* Estilo para a nova área de digitação rica */
         #typing-input {
             width: 100%;
-            height: 80px;
-            margin-top: 10px;
+            min-height: 100px;
+            margin-top: 5px;
             padding: 12px;
             border: 2px solid #ddd;
             border-radius: 8px;
-            font-family: inherit;
+            background: #fff;
+            outline: none;
             box-sizing: border-box;
-            resize: vertical;
+        }
+        .toolbar {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+        .btn-tool {
+            padding: 5px 10px;
+            font-size: 0.8rem;
+            background: #eee;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            cursor: pointer;
         }
         .controls {
             display: flex;
@@ -93,8 +107,13 @@
     <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
     <h3>⌨️ Digitação Manual</h3>
+    <div class="toolbar">
+        <button class="btn-tool" onclick="execCmd('bold')"><b>B</b></button>
+        <button class="btn-tool" onclick="execCmd('italic')"><i>I</i></button>
+        <button class="btn-tool" onclick="execCmd('underline')"><u>U</u></button>
+    </div>
     <div id="typing-display" class="display-box"></div>
-    <textarea id="typing-input" placeholder="Digite algo aqui..."></textarea>
+    <div id="typing-input" contenteditable="true"></div>
 </div>
 
 <script>
@@ -116,7 +135,20 @@
         "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"
     ];
 
-    // Lógica do Reconhecimento de Voz (Mantida conforme solicitado)
+    // Mapeamento de pontuação para o ditado
+    const punctuationMap = {
+        "vírgula": ",",
+        "ponto": ".",
+        "dois pontos": ":",
+        "aspas": '"',
+        "interrogação": "?",
+        "exclamação": "!"
+    };
+
+    function execCmd(command) {
+        document.execCommand(command, false, null);
+    }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.lang = 'pt-BR';
@@ -131,7 +163,13 @@
 
     recognition.onresult = (event) => {
         const lastIndex = event.results.length - 1;
-        const text = event.results[lastIndex][0].transcript.toLowerCase().trim();
+        let text = event.results[lastIndex][0].transcript.toLowerCase().trim();
+        
+        // --- FIX IS HERE: Punctuation Handling ---
+        for (const [key, value] of Object.entries(punctuationMap)) {
+            text = text.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
+        }
+        
         processInput(text, transcriptBox, true);
     };
 
@@ -145,19 +183,18 @@
         stopBtn.disabled = true;
     };
 
-    // --- FIX IS HERE: Typing Box Logic ---
+    // --- FIX IS HERE: Rich Typing Box Logic ---
     typingInput.oninput = () => {
-        const text = typingInput.value.toLowerCase();
+        const text = typingInput.innerText.toLowerCase();
         processInput(text, typingDisplay, false);
     };
-    // --- END OF FIX ---
 
     function processInput(text, targetBox, append) {
         const words = text.split(/\s+/);
         let resultHTML = "";
 
         words.forEach(word => {
-            const cleanWord = word.replace(/[.,!?;]/g, "");
+            const cleanWord = word.replace(/[.,!?;:"]/g, ""); // Incluído : e " na limpeza
             if (ptVocabularyA.includes(cleanWord)) {
                 resultHTML += `<span class="found">${word}</span> `;
             } else {
@@ -175,7 +212,7 @@
 
     startBtn.onclick = async () => {
         if (window.location.protocol === 'file:') {
-            alert("Atenção: O microfone NÃO funciona via file://. Use um servidor local.");
+            alert("Use um servidor local.");
             return;
         }
         try {
