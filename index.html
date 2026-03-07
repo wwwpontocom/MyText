@@ -56,7 +56,7 @@
             overflow-y: auto;
             max-height: 300px;
         }
-        /* Estilos da Enciclopédia */
+        /* Estilos Novos IA */
         #ai-box { border-color: var(--ai-accent); background: #fdfaff; min-height: 100px; }
         .ai-header { color: var(--ai-accent); display: flex; align-items: center; gap: 10px; margin-top: 20px; }
         .ai-search-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 2px solid #ddd; box-sizing: border-box; }
@@ -123,9 +123,9 @@
     <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
     <h3 class="ai-header"><span>🤖</span> AI Encyclopedia</h3>
-    <input type="text" id="ai-search" class="ai-search-input" placeholder="Pesquisar ou diga 'Pesquisar [termo]'...">
+    <input type="text" id="ai-search" class="ai-search-input" placeholder="Pesquisar ou diga 'pesquisar [termo]'...">
     <div id="ai-box" class="display-box">
-        <div id="ai-content"><i>Aguardando busca...</i></div>
+        <div id="ai-content"><i>Aguardando comando ou busca...</i></div>
     </div>
 
     <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
@@ -175,7 +175,7 @@
         document.execCommand(command, false, null);
     }
 
-    // Lógica de busca da Enciclopédia
+    // Lógica da Enciclopédia
     function buscarNaEnciclopedia(termo) {
         if (!termo || typeof BIBLIOTECA_ENCICLOPEDIA === 'undefined') return;
         const query = termo.toLowerCase().trim();
@@ -190,7 +190,7 @@
             }
         }
         if (!encontrado && query.length > 2) {
-            aiContent.innerHTML = `<i>Sem resultados para "${termo}".</i>`;
+            aiContent.innerHTML = `<i>Nenhum resultado para "${termo}".</i>`;
         }
     }
 
@@ -234,15 +234,14 @@
             return;
         }
 
-        // --- INTEGRAÇÃO COM ENCICLOPÉDIA VIA VOZ ---
-        const triggerIA = "pesquisar";
-        if (originalText.startsWith(triggerIA)) {
-            const termo = originalText.replace(triggerIA, "").trim();
+        // --- CHECK PARA COMANDO PESQUISAR ---
+        if (originalText.startsWith("pesquisar")) {
+            const termo = originalText.replace("pesquisar", "").trim();
             buscarNaEnciclopedia(termo);
             return;
         }
 
-        // --- MANUTENÇÃO DO DITADO E SOLETRAR ---
+        // --- MANTENDO O FIX DO DITADO INTACTO ---
         let processedText = "";
         const trigger = "comando soletrar";
         
@@ -303,12 +302,13 @@
 
     startBtn.onclick = async () => {
         if (window.location.protocol === 'file:') {
-            alert("Use um servidor local (Live Server).");
+            alert("Use um servidor local.");
             return;
         }
         try {
-            await navigator.mediaDevices.getUserMedia({ audio: true });
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
             recognition.start();
+            stream.getTracks().forEach(track => track.stop());
         } catch (err) {
             statusText.innerText = "❌ Erro: Permissão negada.";
         }
