@@ -4,17 +4,18 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dicionário Local AI</title>
-    <script src="data_fases.js"></script>
+    <script src="data_.js"></script>
     <script src="data_extras.js"></script>
-    <script src="./data_licoes.js"></script>
-    <script src="data_plano.js"></script>
-    <script src="data_exercicios.js"></script>
-    <script src="data_dia.js"></script>
+    <script src="./data_.js"></script>
+    <script src="data_.js"></script>
+    <script src="data_.js"></script>
+    <script src="data_.js"></script>
     <script src="data_logs.js"></script>
     <script src="data_audios.js"></script>
-    <script src="data_moo.js"></script>
-    <script src="data_programa_minimo.js"></script>
+    <script src="data_.js"></script>
+    <script src="data_.js"></script>
     <script src="data_enciclopedia.js"></script>
+    
     <style>
         :root {
             --primary: #4a90e2;
@@ -56,7 +57,6 @@
             overflow-y: auto;
             max-height: 300px;
         }
-        /* Estilos Novos IA */
         #ai-box { border-color: var(--ai-accent); background: #fdfaff; min-height: 100px; }
         .ai-header { color: var(--ai-accent); display: flex; align-items: center; gap: 10px; margin-top: 20px; }
         .ai-search-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 2px solid #ddd; box-sizing: border-box; }
@@ -131,16 +131,16 @@
     <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
     <h3>⌨️ Digitação Manual</h3>
-   
     <div id="typing-display" class="display-box"></div>
-
-     <div class="toolbar">
+    <div class="toolbar">
         <button class="btn-tool" onclick="execCmd('bold')"><b>B</b></button>
         <button class="btn-tool" onclick="execCmd('italic')"><i>I</i></button>
         <button class="btn-tool" onclick="execCmd('underline')"><u>U</u></button>
     </div>
     <div id="typing-input" contenteditable="true"></div>
 </div>
+
+<script src="main.js"></script>
 
 <script>
     const startBtn = document.getElementById('start-btn');
@@ -149,8 +149,6 @@
     const transcriptBox = document.getElementById('transcript-box');
     const typingInput = document.getElementById('typing-input');
     const typingDisplay = document.getElementById('typing-display');
-    const aiContent = document.getElementById('ai-content');
-    const aiSearch = document.getElementById('ai-search');
 
     const ptVocabularyA = [
         "abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", 
@@ -172,31 +170,6 @@
         "interrogação": "?",
         "exclamação": "!"
     };
-
-    function execCmd(command) {
-        document.execCommand(command, false, null);
-    }
-
-    // Lógica da Enciclopédia
-    function buscarNaEnciclopedia(termo) {
-        if (!termo || typeof BIBLIOTECA_ENCICLOPEDIA === 'undefined') return;
-        const query = termo.toLowerCase().trim();
-        let encontrado = false;
-
-        for (const key in BIBLIOTECA_ENCICLOPEDIA) {
-            const entry = BIBLIOTECA_ENCICLOPEDIA[key];
-            if (entry.keywords.some(k => query.includes(k.toLowerCase()))) {
-                aiContent.innerHTML = `<strong>${entry.icone} ${entry.titulo}</strong><br>${entry.html_content}`;
-                encontrado = true;
-                break;
-            }
-        }
-        if (!encontrado && query.length > 2) {
-            aiContent.innerHTML = `<i>Nenhum resultado para "${termo}".</i>`;
-        }
-    }
-
-    aiSearch.oninput = (e) => buscarNaEnciclopedia(e.target.value);
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
@@ -236,14 +209,13 @@
             return;
         }
 
-        // --- CHECK PARA COMANDO PESQUISAR ---
+        // --- CHECK PARA COMANDO PESQUISAR (Integrado com main.js se existir) ---
         if (originalText.startsWith("pesquisar")) {
             const termo = originalText.replace("pesquisar", "").trim();
-            buscarNaEnciclopedia(termo);
+            if (typeof buscarNaEnciclopedia === 'function') buscarNaEnciclopedia(termo);
             return;
         }
 
-        // --- MANTENDO O FIX DO DITADO INTACTO ---
         let processedText = "";
         const trigger = "comando soletrar";
         
@@ -265,19 +237,10 @@
         processInput(processedText, transcriptBox, true);
     };
 
-    recognition.onerror = (event) => {
-        statusText.innerText = "❌ Erro: " + event.error;
-    };
-
     recognition.onend = () => {
         statusText.innerText = "Ditado pausado.";
         startBtn.disabled = false;
         stopBtn.disabled = true;
-    };
-
-    typingInput.oninput = () => {
-        const text = typingInput.innerText.toLowerCase();
-        processInput(text, typingDisplay, false);
     };
 
     function processInput(text, targetBox, append) {
@@ -308,17 +271,14 @@
             return;
         }
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            await navigator.mediaDevices.getUserMedia({ audio: true });
             recognition.start();
-            stream.getTracks().forEach(track => track.stop());
         } catch (err) {
             statusText.innerText = "❌ Erro: Permissão negada.";
         }
     };
 
-    stopBtn.onclick = () => {
-        recognition.stop();
-    };
+    stopBtn.onclick = () => { recognition.stop(); };
 </script>
 
 </body>
