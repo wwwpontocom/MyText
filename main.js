@@ -51,20 +51,41 @@ if (aiSearch) {
 // Export to Word (.doc)
 function exportToWord() {
     const content = document.getElementById('typing-input').innerHTML;
-    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
-            "xmlns:w='urn:schemas-microsoft-com:office:word' "+
-            "xmlns='http://www.w3.org/TR/REC-html40'>"+
-            "<head><meta charset='utf-8'><title>Export Word</title></head><body>";
+    
+    // Template HTML necessário para o Word reconhecer a codificação e estilos
+    const header = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+              xmlns:w='urn:schemas-microsoft-com:office:word' 
+              xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+            <meta charset='utf-8'>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; }
+            </style>
+        </head>
+        <body>
+    `;
     const footer = "</body></html>";
     const sourceHTML = header + content + footer;
-    
-    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+
+    // Criamos um Blob com o conteúdo e o tipo MIME correto
+    const blob = new Blob(['\ufeff', sourceHTML], {
+        type: 'application/msword'
+    });
+
+    // Geramos um link temporário para o download
+    const url = URL.createObjectURL(blob);
     const fileDownload = document.createElement("a");
+    
+    fileDownload.href = url;
+    fileDownload.download = 'documento.doc'; // Você também pode tentar .docx em alguns casos
+    
     document.body.appendChild(fileDownload);
-    fileDownload.href = source;
-    fileDownload.download = 'documento.doc';
     fileDownload.click();
+    
+    // Limpeza
     document.body.removeChild(fileDownload);
+    URL.revokeObjectURL(url);
 }
 
 // Export to PDF (Uses Print functionality to preserve styles/fonts)
