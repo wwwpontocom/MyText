@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dicionário Local AI</title>
-   <script src="data_.js"></script>
+    <script src="data_.js"></script>
     <script src="data_extras.js"></script>
     <script src="./data_.js"></script>
     <script src="data_.js"></script>
@@ -15,25 +15,8 @@
     <script src="data_.js"></script>
     <script src="data_.js"></script>
     <script src="data_enciclopedia.js"></script>
-    <style>
-        :root { --primary: #4a90e2; --bg: #f5f7fa; --card: #ffffff; --ai-accent: #8e44ad; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
-        #app-container { background: var(--card); padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 95%; max-width: 600px; }
-        #status { color: var(--primary); font-weight: bold; margin-bottom: 1rem; text-align: center; }
-        .display-box { min-height: 150px; border: 2px solid #eee; padding: 15px; border-radius: 10px; background: #fff; margin-bottom: 20px; line-height: 1.6; overflow-y: auto; max-height: 300px; }
-        #ai-box { border-color: var(--ai-accent); background: #fdfaff; min-height: 100px; }
-        .ai-header { color: var(--ai-accent); display: flex; align-items: center; gap: 10px; margin-top: 20px; }
-        .ai-search-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 2px solid #ddd; box-sizing: border-box; }
-        #typing-input { width: 100%; min-height: 100px; margin-top: 5px; padding: 12px; border: 2px solid #ddd; border-radius: 8px; background: #fff; outline: none; box-sizing: border-box; }
-        .toolbar { display: flex; gap: 5px; margin-bottom: 5px; }
-        .btn-tool { padding: 5px 10px; font-size: 0.8rem; background: #eee; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
-        .controls { display: flex; gap: 10px; justify-content: center; }
-        button { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: transform 0.1s; }
-        #start-btn { background: #28a745; color: white; }
-        #stop-btn { background: #dc3545; color: white; }
-        .found { color: #28a745; font-weight: bold; }
-        .not-found { color: #888; text-decoration: underline dotted; }
-    </style>
+    
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -75,7 +58,7 @@
         </select>
 
         <button class="btn-tool" onclick="exportToWord()" style="background: #e7f3ff; border-color: #7cc0ff;">📄 Word</button>
-    <button class="btn-tool" onclick="exportToPDF()" style="background: #ffe7e7; border-color: #ff7c7c;">📕 PDF</button>
+        <button class="btn-tool" onclick="exportToPDF()" style="background: #ffe7e7; border-color: #ff7c7c;">📕 PDF</button>
     </div>
     <div id="typing-input" contenteditable="true"></div>
 </div>
@@ -104,7 +87,6 @@
         else { targetBox.innerHTML = resultHTML; }
     }
 
-    // Speech Recognition
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.lang = 'pt-BR';
@@ -138,4 +120,3 @@
 
 </body>
 </html>
-    
