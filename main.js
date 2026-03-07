@@ -106,3 +106,58 @@ function exportToPDF() {
     document.body.innerHTML = originalBody;
     window.location.reload(); // Reload to re-attach events
 }
+
+// 5. Template System Logic
+
+const templateSelect = document.getElementById('template-select');
+
+// Load template names into dropdown on startup
+function updateTemplateDropdown() {
+    const templates = JSON.parse(localStorage.getItem('typing_templates') || '{}');
+    templateSelect.innerHTML = '<option value="">Modelos...</option>';
+    
+    for (const name in templates) {
+        const option = document.createElement('option');
+        option.value = name;
+        option.textContent = name;
+        templateSelect.appendChild(option);
+    }
+}
+
+function saveTemplate() {
+    const name = prompt("Digite um nome para este modelo:");
+    if (!name) return;
+
+    const content = document.getElementById('typing-input').innerHTML;
+    const templates = JSON.parse(localStorage.getItem('typing_templates') || '{}');
+    
+    templates[name] = content;
+    localStorage.setItem('typing_templates', JSON.stringify(templates));
+    
+    alert("Modelo '" + name + "' salvo com sucesso!");
+    updateTemplateDropdown();
+}
+
+function loadTemplate() {
+    const selectedName = templateSelect.value;
+    if (!selectedName) {
+        alert("Por favor, selecione um modelo na lista.");
+        return;
+    }
+
+    const templates = JSON.parse(localStorage.getItem('typing_templates') || '{}');
+    const content = templates[selectedName];
+
+    if (content !== undefined) {
+        const inputArea = document.getElementById('typing-input');
+        inputArea.innerHTML = content;
+        
+        // Trigger the dictionary processing manually after loading
+        if (typeof processInput === 'function') {
+            processInput(inputArea.innerText.toLowerCase(), document.getElementById('typing-display'), false);
+        }
+    }
+}
+
+// Initialize the dropdown when the script loads
+updateTemplateDropdown();
