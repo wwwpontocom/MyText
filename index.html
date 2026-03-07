@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dicionário Local AI</title>
-    <script src="data_.js"></script>
+   <script src="data_.js"></script>
     <script src="data_extras.js"></script>
     <script src="./data_.js"></script>
     <script src="data_.js"></script>
@@ -15,96 +15,24 @@
     <script src="data_.js"></script>
     <script src="data_.js"></script>
     <script src="data_enciclopedia.js"></script>
-    
     <style>
-        :root {
-            --primary: #4a90e2;
-            --bg: #f5f7fa;
-            --card: #ffffff;
-            --ai-accent: #8e44ad;
-        }
-        body {
-            font-family: 'Segoe UI', system-ui, sans-serif;
-            background-color: var(--bg);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            margin: 0;
-        }
-        #app-container {
-            background: var(--card);
-            padding: 2rem;
-            border-radius: 15px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            width: 95%;
-            max-width: 600px;
-        }
-        #status {
-            color: var(--primary);
-            font-weight: bold;
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        .display-box {
-            min-height: 150px;
-            border: 2px solid #eee;
-            padding: 15px;
-            border-radius: 10px;
-            background: #fff;
-            margin-bottom: 20px;
-            line-height: 1.6;
-            overflow-y: auto;
-            max-height: 300px;
-        }
+        :root { --primary: #4a90e2; --bg: #f5f7fa; --card: #ffffff; --ai-accent: #8e44ad; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); display: flex; flex-direction: column; align-items: center; padding: 20px; margin: 0; }
+        #app-container { background: var(--card); padding: 2rem; border-radius: 15px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 95%; max-width: 600px; }
+        #status { color: var(--primary); font-weight: bold; margin-bottom: 1rem; text-align: center; }
+        .display-box { min-height: 150px; border: 2px solid #eee; padding: 15px; border-radius: 10px; background: #fff; margin-bottom: 20px; line-height: 1.6; overflow-y: auto; max-height: 300px; }
         #ai-box { border-color: var(--ai-accent); background: #fdfaff; min-height: 100px; }
         .ai-header { color: var(--ai-accent); display: flex; align-items: center; gap: 10px; margin-top: 20px; }
         .ai-search-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 2px solid #ddd; box-sizing: border-box; }
-
-        #typing-input {
-            width: 100%;
-            min-height: 100px;
-            margin-top: 5px;
-            padding: 12px;
-            border: 2px solid #ddd;
-            border-radius: 8px;
-            background: #fff;
-            outline: none;
-            box-sizing: border-box;
-        }
-        .toolbar {
-            display: flex;
-            gap: 5px;
-            margin-bottom: 5px;
-        }
-        .btn-tool {
-            padding: 5px 10px;
-            font-size: 0.8rem;
-            background: #eee;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            cursor: pointer;
-        }
-        .controls {
-            display: flex;
-            gap: 10px;
-            justify-content: center;
-        }
-        button {
-            padding: 12px 25px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: transform 0.1s;
-        }
-        button:active { transform: scale(0.95); }
+        #typing-input { width: 100%; min-height: 100px; margin-top: 5px; padding: 12px; border: 2px solid #ddd; border-radius: 8px; background: #fff; outline: none; box-sizing: border-box; }
+        .toolbar { display: flex; gap: 5px; margin-bottom: 5px; }
+        .btn-tool { padding: 5px 10px; font-size: 0.8rem; background: #eee; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; }
+        .controls { display: flex; gap: 10px; justify-content: center; }
+        button { padding: 12px 25px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; transition: transform 0.1s; }
         #start-btn { background: #28a745; color: white; }
         #stop-btn { background: #dc3545; color: white; }
-        button:disabled { background: #ccc; cursor: not-allowed; }
         .found { color: #28a745; font-weight: bold; }
         .not-found { color: #888; text-decoration: underline dotted; }
-        h3 { margin: 10px 0; color: #333; }
     </style>
 </head>
 <body>
@@ -123,7 +51,7 @@
     <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
 
     <h3 class="ai-header"><span>🤖</span> AI Encyclopedia</h3>
-    <input type="text" id="ai-search" class="ai-search-input" placeholder="Pesquisar ou diga 'pesquisar [termo]'...">
+    <input type="text" id="ai-search" class="ai-search-input" placeholder="Pesquisar...">
     <div id="ai-box" class="display-box">
         <div id="ai-content"><i>Aguardando comando ou busca...</i></div>
     </div>
@@ -132,15 +60,22 @@
 
     <h3>⌨️ Digitação Manual</h3>
     <div id="typing-display" class="display-box"></div>
+
     <div class="toolbar">
         <button class="btn-tool" onclick="execCmd('bold')"><b>B</b></button>
         <button class="btn-tool" onclick="execCmd('italic')"><i>I</i></button>
         <button class="btn-tool" onclick="execCmd('underline')"><u>U</u></button>
+        <select class="btn-tool" onchange="execCmd('fontName', this.value)">
+            <option value="Segoe UI">Fonte</option>
+            <option value="Arial">Arial</option>
+            <option value="Calibri">Calibri</option>
+            <option value="Courier New">Courier New</option>
+            <option value="Georgia">Georgia</option>
+            <option value="Verdana">Verdana</option>
+        </select>
     </div>
     <div id="typing-input" contenteditable="true"></div>
 </div>
-
-<script src="main.js"></script>
 
 <script>
     const startBtn = document.getElementById('start-btn');
@@ -150,136 +85,54 @@
     const typingInput = document.getElementById('typing-input');
     const typingDisplay = document.getElementById('typing-display');
 
-    const ptVocabularyA = [
-        "abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", 
-        "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", 
-        "abismo", "abóbora", "abotoar", "abraçar", "abraço", "abranger", 
-        "abrigar", "abrigo", "abril", "absoluto", "absurdo", "abundância", 
-        "acabar", "academia", "acalmar", "acampamento", "ação", "acaso", 
-        "aceitar", "acenar", "acento", "acerto", "aceso", "achar", "acidente", 
-        "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", 
-        "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"
-    ];
+    const ptVocabularyA = ["abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", "abismo", "abóbora", "abotoar", "abraçar", "abraço", "abranger", "abrigar", "abrigo", "abril", "absoluto", "absurdo", "abundância", "acabar", "academia", "acalmar", "acampamento", "ação", "acaso", "aceitar", "acenar", "acento", "acerto", "aceso", "achar", "acidente", "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"];
 
-    const punctuationMap = {
-        "vírgula": ",",
-        "ponto final": ".",
-        "ponto": ".",
-        "dois pontos": ":",
-        "aspas": '"',
-        "interrogação": "?",
-        "exclamação": "!"
-    };
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'pt-BR';
-    recognition.continuous = true;
-    recognition.interimResults = false;
-
-    recognition.onstart = () => {
-        statusText.innerText = "🎤 Ouvindo...";
-        startBtn.disabled = true;
-        stopBtn.disabled = false;
-    };
-
-    function handleSpelling(text) {
-        const tokens = text.trim().split(/\s+/);
-        let word = "";
-        let makeUpper = false;
-
-        tokens.forEach(token => {
-            if (token === "maiúsculo" || token === "maiúscula") {
-                makeUpper = true;
-            } else {
-                let char = token.charAt(0);
-                word += makeUpper ? char.toUpperCase() : char.toLowerCase();
-                makeUpper = false;
-            }
-        });
-        return word;
-    }
-
-    recognition.onresult = (event) => {
-        const lastIndex = event.results.length - 1;
-        let originalText = event.results[lastIndex][0].transcript.toLowerCase().trim();
-        
-        if (originalText === "novo parágrafo" || originalText === "nova linha") {
-            transcriptBox.innerHTML += "<br><br>";
-            return;
-        }
-
-        // --- CHECK PARA COMANDO PESQUISAR (Integrado com main.js se existir) ---
-        if (originalText.startsWith("pesquisar")) {
-            const termo = originalText.replace("pesquisar", "").trim();
-            if (typeof buscarNaEnciclopedia === 'function') buscarNaEnciclopedia(termo);
-            return;
-        }
-
-        let processedText = "";
-        const trigger = "comando soletrar";
-        
-        if (originalText.includes(trigger)) {
-            const parts = originalText.split(trigger);
-            let normalPart = parts[0].trim();
-            for (const [key, value] of Object.entries(punctuationMap)) {
-                normalPart = normalPart.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
-            }
-            let spelledPart = handleSpelling(parts[1]);
-            processedText = (normalPart ? normalPart + " " : "") + spelledPart;
-        } else {
-            processedText = originalText;
-            for (const [key, value] of Object.entries(punctuationMap)) {
-                processedText = processedText.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
-            }
-        }
-        
-        processInput(processedText, transcriptBox, true);
-    };
-
-    recognition.onend = () => {
-        statusText.innerText = "Ditado pausado.";
-        startBtn.disabled = false;
-        stopBtn.disabled = true;
-    };
+    const punctuationMap = { "vírgula": ",", "ponto final": ".", "ponto": ".", "dois pontos": ":", "aspas": '"', "interrogação": "?", "exclamação": "!" };
 
     function processInput(text, targetBox, append) {
         if (!text) return;
         const words = text.split(/\s+/);
         let resultHTML = "";
-
         words.forEach(word => {
             const cleanWord = word.replace(/[.,!?;:"]/g, "");
-            if (ptVocabularyA.includes(cleanWord)) {
-                resultHTML += `<span class="found">${word}</span> `;
-            } else {
-                resultHTML += `<span class="not-found">${word}</span> `;
-            }
+            resultHTML += ptVocabularyA.includes(cleanWord) ? `<span class="found">${word}</span> ` : `<span class="not-found">${word}</span> `;
         });
-
-        if (append) {
-            targetBox.innerHTML += resultHTML + " ";
-            targetBox.scrollTop = targetBox.scrollHeight;
-        } else {
-            targetBox.innerHTML = resultHTML;
-        }
+        if (append) { targetBox.innerHTML += resultHTML + " "; targetBox.scrollTop = targetBox.scrollHeight; }
+        else { targetBox.innerHTML = resultHTML; }
     }
 
-    startBtn.onclick = async () => {
-        if (window.location.protocol === 'file:') {
-            alert("Use um servidor local.");
+    // Speech Recognition
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = true;
+
+    recognition.onstart = () => { statusText.innerText = "🎤 Ouvindo..."; startBtn.disabled = true; stopBtn.disabled = false; };
+    recognition.onend = () => { statusText.innerText = "Ditado pausado."; startBtn.disabled = false; stopBtn.disabled = true; };
+
+    recognition.onresult = (event) => {
+        const lastIndex = event.results.length - 1;
+        let originalText = event.results[lastIndex][0].transcript.toLowerCase().trim();
+        
+        if (originalText.startsWith("pesquisar")) {
+            const termo = originalText.replace("pesquisar", "").trim();
+            if(window.buscarNaEnciclopedia) window.buscarNaEnciclopedia(termo);
             return;
         }
-        try {
-            await navigator.mediaDevices.getUserMedia({ audio: true });
-            recognition.start();
-        } catch (err) {
-            statusText.innerText = "❌ Erro: Permissão negada.";
+
+        let processedText = originalText;
+        for (const [key, value] of Object.entries(punctuationMap)) {
+            processedText = processedText.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
         }
+        processInput(processedText, transcriptBox, true);
     };
 
-    stopBtn.onclick = () => { recognition.stop(); };
+    startBtn.onclick = () => recognition.start();
+    stopBtn.onclick = () => recognition.stop();
 </script>
+
+<script src="main.js"></script>
 
 </body>
 </html>
+    
