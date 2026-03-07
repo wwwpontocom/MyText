@@ -4,11 +4,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dicionário Local AI</title>
-    <style>
+    <script src="data_fases.js"></script>
+    <script src="data_extras.js"></script>
+    <script src="./data_licoes.js"></script>
+    <script src="data_plano.js"></script>
+    <script src="data_exercicios.js"></script>
+    <script src="data_dia.js"></script>
+    <script src="data_logs.js"></script>
+    <script src="data_audios.js"></script>
+    <script src="data_moo.js"></script>
+    <script src="data_programa_minimo.js"></script>
+    <script src="data_enciclopedia.js"></script>
+    <script src="data_vocabularios.js"></script> <style>
         :root {
             --primary: #4a90e2;
             --bg: #f5f7fa;
             --card: #ffffff;
+            --ai-accent: #8e44ad;
         }
         body {
             font-family: 'Segoe UI', system-ui, sans-serif;
@@ -44,6 +56,11 @@
             overflow-y: auto;
             max-height: 300px;
         }
+        /* Estilo do novo Box IA */
+        #ai-box { border-color: var(--ai-accent); background: #fdfaff; min-height: 100px; }
+        .ai-header { color: var(--ai-accent); display: flex; align-items: center; gap: 10px; margin-top: 20px; }
+        .ai-search-input { width: 100%; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 2px solid #ddd; box-sizing: border-box; }
+
         #typing-input {
             width: 100%;
             min-height: 100px;
@@ -93,7 +110,7 @@
 <body>
 
 <div id="app-container">
-    <h2 style="text-align:center">AI Dictation & Typing</h2>
+    <h2 style="text-align:center">AI Dictation, Typing & Encyclopedia</h2>
     
     <h3>🎤 Ditado por Voz</h3>
     <p id="status">Clique em Iniciar para ditar...</p>
@@ -101,6 +118,14 @@
     <div class="controls">
         <button id="start-btn">Iniciar Ditado</button>
         <button id="stop-btn" disabled>Parar</button>
+    </div>
+
+    <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
+
+    <h3 class="ai-header"><span>🤖</span> AI Encyclopedia</h3>
+    <input type="text" id="ai-search" class="ai-search-input" placeholder="Pesquisar na enciclopédia...">
+    <div id="ai-box" class="display-box">
+        <div id="ai-content"><i>Aguardando comando ou busca...</i></div>
     </div>
 
     <hr style="margin: 30px 0; border: 0; border-top: 1px solid #eee;">
@@ -120,19 +145,10 @@
     const stopBtn = document.getElementById('stop-btn');
     const statusText = document.getElementById('status');
     const transcriptBox = document.getElementById('transcript-box');
+    const aiContent = document.getElementById('ai-content');
+    const aiSearch = document.getElementById('ai-search');
     const typingInput = document.getElementById('typing-input');
     const typingDisplay = document.getElementById('typing-display');
-
-    const ptVocabularyA = [
-        "abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", 
-        "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", 
-        "abismo", "abóbora", "abotoar", "abraçar", "abraço", "abranger", 
-        "abrigar", "abrigo", "abril", "absoluto", "absurdo", "abundância", 
-        "acabar", "academia", "acalmar", "acampamento", "ação", "acaso", 
-        "aceitar", "acenar", "acento", "acerto", "aceso", "achar", "acidente", 
-        "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", 
-        "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"
-    ];
 
     const punctuationMap = {
         "vírgula": ",",
@@ -147,6 +163,32 @@
     function execCmd(command) {
         document.execCommand(command, false, null);
     }
+
+    // --- LÓGICA DA ENCICLOPÉDIA ---
+    function buscarNaEnciclopedia(termo) {
+        if (!termo || typeof BIBLIOTECA_ENCICLOPEDIA === 'undefined') return;
+        const query = termo.toLowerCase().trim();
+        let encontrado = false;
+
+        for (const key in BIBLIOTECA_ENCICLOPEDIA) {
+            const entry = BIBLIOTECA_ENCICLOPEDIA[key];
+            if (entry.keywords.some(k => query.includes(k.toLowerCase()))) {
+                aiContent.innerHTML = `
+                    <div style="border-bottom: 1px solid #ddd; padding-bottom: 5px; margin-bottom: 10px;">
+                        <strong>${entry.icone} ${entry.titulo}</strong>
+                    </div>
+                    ${entry.html_content}
+                `;
+                encontrado = true;
+                break;
+            }
+        }
+        if (!encontrado && query.length > 3) {
+            aiContent.innerHTML = `<i>Nenhum resultado para "${termo}".</i>`;
+        }
+    }
+
+    aiSearch.oninput = (e) => buscarNaEnciclopedia(e.target.value);
 
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
@@ -186,30 +228,31 @@
             return;
         }
 
-        // --- FIX IS HERE: Mid-sentence "comando soletrar" detection ---
+        // Comando de voz para Enciclopédia
+        const triggerIA = "pesquisar";
+        if (originalText.startsWith(triggerIA)) {
+            const termo = originalText.replace(triggerIA, "").trim();
+            buscarNaEnciclopedia(termo);
+            return;
+        }
+
         let processedText = "";
-        const trigger = "comando soletrar";
+        const triggerSoletrar = "comando soletrar";
         
-        if (originalText.includes(trigger)) {
-            const parts = originalText.split(trigger);
-            // Parte 1: Texto normal antes do comando
+        if (originalText.includes(triggerSoletrar)) {
+            const parts = originalText.split(triggerSoletrar);
             let normalPart = parts[0].trim();
             for (const [key, value] of Object.entries(punctuationMap)) {
                 normalPart = normalPart.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
             }
-            
-            // Parte 2: Texto soletrado após o comando
             let spelledPart = handleSpelling(parts[1]);
-            
             processedText = (normalPart ? normalPart + " " : "") + spelledPart;
         } else {
-            // Ditado normal caso não haja o comando
             processedText = originalText;
             for (const [key, value] of Object.entries(punctuationMap)) {
                 processedText = processedText.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
             }
         }
-        // --- END OF FIX ---
         
         processInput(processedText, transcriptBox, true);
     };
@@ -236,7 +279,8 @@
 
         words.forEach(word => {
             const cleanWord = word.replace(/[.,!?;:"]/g, "");
-            if (ptVocabularyA.includes(cleanWord)) {
+            // Verifica se ptVocabularyA existe (carregado externamente)
+            if (typeof ptVocabularyA !== 'undefined' && ptVocabularyA.includes(cleanWord)) {
                 resultHTML += `<span class="found">${word}</span> `;
             } else {
                 resultHTML += `<span class="not-found">${word}</span> `;
@@ -253,13 +297,12 @@
 
     startBtn.onclick = async () => {
         if (window.location.protocol === 'file:') {
-            alert("Use um servidor local.");
+            alert("Use um servidor local (Live Server) para usar a API de voz.");
             return;
         }
         try {
-            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            await navigator.mediaDevices.getUserMedia({ audio: true });
             recognition.start();
-            stream.getTracks().forEach(track => track.stop());
         } catch (err) {
             statusText.innerText = "❌ Erro: Permissão negada.";
         }
