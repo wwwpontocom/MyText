@@ -45,3 +45,43 @@ window.buscarNaEnciclopedia = function(termo) {
 if (aiSearch) {
     aiSearch.oninput = (e) => window.buscarNaEnciclopedia(e.target.value);
 }
+
+// 4. Export Logic
+
+// Export to Word (.doc)
+function exportToWord() {
+    const content = document.getElementById('typing-input').innerHTML;
+    const header = "<html xmlns:o='urn:schemas-microsoft-com:office:office' "+
+            "xmlns:w='urn:schemas-microsoft-com:office:word' "+
+            "xmlns='http://www.w3.org/TR/REC-html40'>"+
+            "<head><meta charset='utf-8'><title>Export Word</title></head><body>";
+    const footer = "</body></html>";
+    const sourceHTML = header + content + footer;
+    
+    const source = 'data:application/vnd.ms-word;charset=utf-8,' + encodeURIComponent(sourceHTML);
+    const fileDownload = document.createElement("a");
+    document.body.appendChild(fileDownload);
+    fileDownload.href = source;
+    fileDownload.download = 'documento.doc';
+    fileDownload.click();
+    document.body.removeChild(fileDownload);
+}
+
+// Export to PDF (Uses Print functionality to preserve styles/fonts)
+function exportToPDF() {
+    const content = document.getElementById('typing-input').innerHTML;
+    const originalBody = document.body.innerHTML;
+
+    // Temporary print-friendly layout
+    document.body.innerHTML = `
+        <div style="padding: 40px; font-family: 'Segoe UI', sans-serif;">
+            ${content}
+        </div>
+    `;
+
+    window.print();
+    
+    // Restore page after printing
+    document.body.innerHTML = originalBody;
+    window.location.reload(); // Reload to re-attach events
+}
