@@ -1,11 +1,13 @@
+// main.js - Logic for Encyclopedia and UI interactions
+
 // 1. Manual Typing Logic
 const typingInputEl = document.getElementById('typing-input');
 const typingDisplayEl = document.getElementById('typing-display');
 
 if (typingInputEl) {
     typingInputEl.oninput = () => {
+        // We use innerText to ignore HTML tags when checking the dictionary
         const text = typingInputEl.innerText.toLowerCase();
-        // Uses the processInput function defined in the HTML
         if (typeof processInput === 'function') {
             processInput(text, typingDisplayEl, false);
         }
@@ -13,15 +15,16 @@ if (typingInputEl) {
 }
 
 // 2. Toolbar Command Logic
-function execCmd(command) {
-    document.execCommand(command, false, null);
+// Updated to accept a second parameter for font selection
+function execCmd(command, value = null) {
+    document.execCommand(command, false, value);
 }
 
 // 3. AI Encyclopedia Search Logic
 const aiContent = document.getElementById('ai-content');
 const aiSearch = document.getElementById('ai-search');
 
-function buscarNaEnciclopedia(termo) {
+window.buscarNaEnciclopedia = function(termo) {
     if (!termo || typeof BIBLIOTECA_ENCICLOPEDIA === 'undefined') return;
     const query = termo.toLowerCase().trim();
     let encontrado = false;
@@ -37,8 +40,8 @@ function buscarNaEnciclopedia(termo) {
     if (!encontrado && query.length > 2) {
         aiContent.innerHTML = `<i>Nenhum resultado para "${termo}".</i>`;
     }
-}
+};
 
 if (aiSearch) {
-    aiSearch.oninput = (e) => buscarNaEnciclopedia(e.target.value);
+    aiSearch.oninput = (e) => window.buscarNaEnciclopedia(e.target.value);
 }
