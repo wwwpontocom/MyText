@@ -29,6 +29,14 @@ function getLibraryData() {
     return brain;
 }
 
+// Helper to trigger search from suggested buttons
+window.triggerSearch = function(topic) {
+    if (aiSearch) {
+        aiSearch.value = topic;
+        window.askSmartAI(topic);
+    }
+};
+
 window.askSmartAI = function(query) {
     if (!query || query.length < 2) return;
     
@@ -36,6 +44,7 @@ window.askSmartAI = function(query) {
     const brain = getLibraryData();
     let bestMatch = null;
     let highestScore = 0;
+    let suggestions = [];
 
     // 1. Search Logic
     for (const key in brain) {
@@ -50,15 +59,45 @@ window.askSmartAI = function(query) {
         if (score > highestScore) {
             highestScore = score;
             bestMatch = entry;
+            bestMatch.key = key; // Store key to avoid suggesting itself
         }
     }
 
-    // 2. Conversational Logic (The Chat Layer)
+    // 2. Suggestion Logic (Find 3 related items)
+    if (bestMatch) {
+        suggestions = Object.keys(brain)
+            .filter(key => key !== bestMatch.key) // Don't suggest current topic
+            .filter(key => {
+                // Check if they share keywords or are in the same phase/category
+                const entry = brain[key];
+                return entry.fase === bestMatch.fase || 
+                       entry.keywords.some(k => bestMatch.keywords.includes(k));
+            })
+            .slice(0, 3); // Limit to 3 suggestions
+    }
+
+    // 3. Conversational Logic (The Chat Layer)
     if (bestMatch && highestScore > 0) {
+        let suggestionHtml = "";
+        if (suggestions.length > 0) {
+            suggestionHtml = `
+                <div style="margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 8px;">
+                    <small style="display:block; margin-bottom: 5px; color: #666;">Tópicos relacionados:</small>
+                    ${suggestions.map(key => `
+                        <button onclick="triggerSearch('${brain[key].titulo}')" 
+                                style="background: #e3f2fd; border: 1px solid #bbdefb; border-radius: 15px; padding: 4px 10px; font-size: 11px; cursor: pointer; margin-right: 5px; color: #1976d2;">
+                            ${brain[key].icone || '🔍'} ${brain[key].titulo}
+                        </button>
+                    `).join('')}
+                </div>
+            `;
+        }
+
         const aiIntroduction = `
             <div class="ai-chat-bubble" style="background: #f0f4f8; padding: 12px; border-radius: 10px; border-left: 4px solid var(--ai-accent); margin-bottom: 15px; font-style: italic;">
                 🤖 <strong>AI Tutor:</strong> "Sobre <b>${bestMatch.titulo}</b>, posso te dizer que ${bestMatch.resumo.toLowerCase()} 
                 Aqui estão os detalhes técnicos que encontrei nos meus arquivos:"
+                ${suggestionHtml}
             </div>
         `;
 
