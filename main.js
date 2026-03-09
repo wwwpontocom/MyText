@@ -37,14 +37,12 @@ window.askSmartAI = function(query) {
     let bestMatch = null;
     let highestScore = 0;
 
+    // 1. Search Logic
     for (const key in brain) {
         let score = 0;
         const entry = brain[key];
-
         if (entry.keywords) {
-            entry.keywords.forEach(k => {
-                if (text.includes(k.toLowerCase())) score += 20;
-            });
+            entry.keywords.forEach(k => { if (text.includes(k.toLowerCase())) score += 20; });
         }
         if (entry.titulo && entry.titulo.toLowerCase().includes(text)) score += 15;
         if (entry.html_content && entry.html_content.toLowerCase().includes(text)) score += 5;
@@ -55,16 +53,28 @@ window.askSmartAI = function(query) {
         }
     }
 
+    // 2. Conversational Logic (The Chat Layer)
     if (bestMatch && highestScore > 0) {
+        const aiIntroduction = `
+            <div class="ai-chat-bubble" style="background: #f0f4f8; padding: 12px; border-radius: 10px; border-left: 4px solid var(--ai-accent); margin-bottom: 15px; font-style: italic;">
+                🤖 <strong>AI Tutor:</strong> "Sobre <b>${bestMatch.titulo}</b>, posso te dizer que ${bestMatch.resumo.toLowerCase()} 
+                Aqui estão os detalhes técnicos que encontrei nos meus arquivos:"
+            </div>
+        `;
+
         aiContent.innerHTML = `
-            <div style="border-left: 4px solid var(--ai-accent); padding-left: 10px;">
-                <small style="color: var(--ai-accent); font-weight: bold;">[CONTEÚDO ENCONTRADO]</small><br>
-                <strong>${bestMatch.icone || 'ℹ️'} ${bestMatch.titulo}</strong><br>
-                <div style="font-size: 0.9rem; margin-top: 5px;">${bestMatch.html_content}</div>
+            ${aiIntroduction}
+            <div class="encyclopedia-entry" style="padding: 10px; border: 1px solid #eee; border-radius: 8px; background: #fff; line-height: 1.6;">
+                <small style="color: #888;">FONTE: Pág. ${bestMatch.pagina || '---'}</small><br>
+                <strong>${bestMatch.icone || '📖'} ${bestMatch.titulo}</strong><hr>
+                ${bestMatch.html_content}
             </div>
         `;
     } else {
-        aiContent.innerHTML = `<i>🧠 Desculpe, não encontrei informações sobre "${query}". Tente outros termos.</i>`;
+        aiContent.innerHTML = `
+            <div class="ai-chat-bubble" style="background: #fff5f5; padding: 12px; border-radius: 10px; border-left: 4px solid #ff4d4d;">
+                🤖 <strong>AI Tutor:</strong> "Ainda não tenho informações detalhadas sobre '${query}' no meu cérebro. Tente pesquisar sobre 'forma', 'espaço' ou 'proporção'."
+            </div>`;
     }
 };
 
@@ -78,12 +88,7 @@ if (aiSearch) {
 // 4. Export Logic
 function exportToWord() {
     const content = document.getElementById('typing-input').innerHTML;
-    const header = `
-        <html xmlns:o='urn:schemas-microsoft-com:office:office' 
-              xmlns:w='urn:schemas-microsoft-com:office:word' 
-              xmlns='http://www.w3.org/TR/REC-html40'>
-        <head><meta charset='utf-8'><style>body { font-family: 'Segoe UI', Arial, sans-serif; }</style></head>
-        <body>`;
+    const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body { font-family: 'Segoe UI', Arial, sans-serif; }</style></head><body>`;
     const footer = "</body></html>";
     const sourceHTML = header + content + footer;
     const blob = new Blob(['\ufeff', sourceHTML], { type: 'application/msword' });
