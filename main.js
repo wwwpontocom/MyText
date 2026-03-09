@@ -40,6 +40,24 @@ window.triggerSearch = function(topic) {
 
 // --- CORE SMART LOGIC ---
 
+// New Helper: Handles analysis of long pasted text
+function analyzePastedContent(text) {
+    const wordCount = text.split(/\s+/).length;
+    // Simple logic to "simulate" reading: extract first sentence and key terms
+    const preview = text.substring(0, 150) + "...";
+    
+    // Create a temporary "entry" for the chat memory
+    lastResult = {
+        titulo: "Conteúdo Externo Analisado",
+        resumo: `um fragmento de texto com aproximadamente ${wordCount} palavras.`,
+        html_content: `<div style="font-style: italic; color: #555;">"${preview}"</div>`,
+        isCustom: true
+    };
+
+    return `Li o conteúdo que você colou (${wordCount} palavras). Parece ser um texto técnico ou literário. 
+            <b>Gostaria que eu fizesse um resumo, extraísse os conceitos principais ou analisasse a estrutura deste trecho?</b>`;
+}
+
 function handleIntents(text, brain) {
     const greetings = ["ola", "olá", "bom dia", "boa tarde", "boa noite", "oi"];
     if (greetings.includes(text)) {
@@ -88,11 +106,18 @@ window.askSmartAI = function(query) {
     const text = query.toLowerCase().trim();
     const brain = getLibraryData();
 
-    // 0. Append User Prompt Bubble (+= instead of =)
-    aiContent.innerHTML += `<div class="user-chat-bubble" style="background: #e9ecef; padding: 10px; border-radius: 10px; margin-bottom: 15px; border-right: 4px solid #adb5bd; font-family: sans-serif; font-size: 0.9rem;">👤 <strong>Você:</strong> "${query}"</div>`;
+    // 0. Append User Prompt Bubble
+    aiContent.innerHTML += `<div class="user-chat-bubble" style="background: #e9ecef; padding: 10px; border-radius: 10px; margin-bottom: 15px; border-right: 4px solid #adb5bd; font-family: sans-serif; font-size: 0.9rem;">👤 <strong>Você:</strong> "${query.substring(0, 100)}${query.length > 100 ? '...' : ''}"</div>`;
     
-    // Helper to scroll to bottom after user message
     aiContent.scrollTop = aiContent.scrollHeight;
+
+    // --- NEW: LONG TEXT ANALYSIS DETECTION ---
+    if (query.length > 200) {
+        const analysisMsg = analyzePastedContent(query);
+        aiContent.innerHTML += `<div class="ai-chat-bubble" style="background: #fdfae6; padding: 12px; border-radius: 10px; border-left: 4px solid #f1c40f; margin-bottom: 15px;">🤖 <strong>AI Analista:</strong> ${analysisMsg}</div>`;
+        aiContent.scrollTop = aiContent.scrollHeight;
+        return;
+    }
 
     // STEP 1: Intent Check
     const intentResponse = handleIntents(text, brain);
@@ -143,7 +168,6 @@ window.askSmartAI = function(query) {
         }
     }
 
-    // Auto-scroll to bottom after AI responds
     aiContent.scrollTop = aiContent.scrollHeight;
 };
 
