@@ -1,4 +1,4 @@
-// main.js - Logic for Encyclopedia, Smart AI, and UI interactions
+// main.js - Logic for Encyclopedia, Smart AI, Dictionary, and UI interactions
 
 let lastResult = null; // Memory for the last topic discussed
 
@@ -28,6 +28,7 @@ function getLibraryData() {
     const brain = {};
     if (typeof BIBLIOTECA_ENCICLOPEDIA !== 'undefined') Object.assign(brain, BIBLIOTECA_ENCICLOPEDIA);
     if (typeof BIBLIOTECA_LIVRO !== 'undefined') Object.assign(brain, BIBLIOTECA_LIVRO);
+    if (typeof BIBLIOTECA_DICIONARIO !== 'undefined') Object.assign(brain, BIBLIOTECA_DICIONARIO);
     return brain;
 }
 
@@ -77,7 +78,6 @@ function handleIntents(text, brain) {
 function synthesizeAnalysis(text, entry) {
     if (text.includes("resumo")) {
         if (entry.isCustom) {
-            // Simulated "Key Points" Identification Logic
             const sentences = entry.fullContent.split(/[.!?]/).filter(s => s.trim().length > 20);
             const keyPoints = sentences.slice(0, 3).map(s => `<li>${s.trim()}</li>`).join('');
             
@@ -85,13 +85,13 @@ function synthesizeAnalysis(text, entry) {
                     <ul style="margin: 10px 0; padding-left: 20px;">${keyPoints}</ul>
                     <b>Resumo da Análise:</b> O texto apresenta uma narrativa técnica focada em detalhes estruturais, totalizando ${entry.fullContent.length} caracteres de fundamentação teórica.`;
         }
-        return `O resumo de <b>${entry.titulo}</b> é: ${entry.resumo}.`;
+        return `O resumo de <b>${entry.titulo}</b> é: ${entry.resumo || entry.definicao}.`;
     }
 
     const analysisPrompts = [
-        { key: "importancia", response: `A importância de <b>${entry.titulo}</b> reside no fato de que ${entry.resumo.toLowerCase()}. Sem isso, o equilíbrio arquitetônico ficaria comprometido.` },
-        { key: "como funciona", response: `O funcionamento de <b>${entry.titulo}</b> se dá através da articulação de elementos que ${entry.resumo.toLowerCase()}, permitindo uma leitura clara do espaço.` },
-        { key: "significa", response: `Em termos conceituais, <b>${entry.titulo}</b> significa ${entry.resumo.toLowerCase()}. É a base para entender este volume.` }
+        { key: "importancia", response: `A importância de <b>${entry.titulo}</b> reside no fato de que ${(entry.resumo || entry.definicao).toLowerCase()}. Sem isso, o equilíbrio arquitetônico ficaria comprometido.` },
+        { key: "como funciona", response: `O funcionamento de <b>${entry.titulo}</b> se dá através da articulação de elementos que ${(entry.resumo || entry.definicao).toLowerCase()}, permitindo uma leitura clara do espaço.` },
+        { key: "significa", response: `Em termos conceituais, <b>${entry.titulo}</b> significa ${(entry.resumo || entry.definicao).toLowerCase()}. É a base para entender este volume.` }
     ];
     for (let p of analysisPrompts) {
         if (text.includes(p.key)) return p.response;
@@ -109,7 +109,8 @@ function getSmartIntroduction(entry) {
     const closers = [" Analise os detalhes técnicos abaixo:", " Veja como isso se aplica no design:", " Note os princípios fundamentais:"];
     const rIntro = openers[Math.floor(Math.random() * openers.length)];
     const rEnd = closers[Math.floor(Math.random() * closers.length)];
-    return `${rIntro}${entry.resumo.toLowerCase()}${rEnd}`;
+    const content = entry.resumo || entry.definicao;
+    return `${rIntro}${content.toLowerCase()}${rEnd}`;
 }
 
 window.askSmartAI = function(query) {
@@ -139,7 +140,7 @@ window.askSmartAI = function(query) {
                 🤖 <strong>Análise:</strong> "${analysis}"
             </div>
             <div class="encyclopedia-entry" style="padding:10px; border:1px solid #eee; background:#fff; font-size:0.9rem; margin-bottom: 15px; border-radius: 8px;">
-                <strong>${lastResult.titulo}</strong><hr>${lastResult.html_content}
+                <strong>${lastResult.titulo}</strong><hr>${lastResult.html_content || lastResult.definicao}
             </div>`;
     } 
     else {
@@ -158,6 +159,7 @@ window.askSmartAI = function(query) {
 
         if (bestMatch && highestScore > 0) {
             lastResult = bestMatch;
+            const isDict = !!bestMatch.definicao;
             let suggestions = Object.keys(brain).filter(k => k !== bestMatch.key && brain[k].fase === bestMatch.fase).slice(0, 3);
             let suggestionHtml = suggestions.length > 0 ? `<div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:5px;"><small>Relacionados:</small> ` + suggestions.map(k => `<button onclick="triggerSearch('${brain[k].titulo}')" style="background:#fff; border:1px solid var(--ai-accent); border-radius:10px; cursor:pointer; font-size:10px; margin-right:3px;">${brain[k].titulo}</button>`).join('') + `</div>` : "";
 
@@ -167,10 +169,12 @@ window.askSmartAI = function(query) {
                     ${suggestionHtml}
                 </div>
                 <div class="encyclopedia-entry" style="padding: 15px; border-radius: 12px; background: #fff; border: 1px solid #eee; margin-bottom: 15px;">
-                    <strong>${bestMatch.icone || '📖'} ${bestMatch.titulo}</strong><hr>${bestMatch.html_content}
+                    <strong>${isDict ? '📖 Dicionário:' : (bestMatch.icone || '📖') + ' ' + bestMatch.titulo}</strong><hr>
+                    ${bestMatch.html_content || bestMatch.definicao}
+                    ${isDict ? `<br><small><i>Contexto: ${bestMatch.contexto}</i></small>` : ''}
                 </div>`;
         } else {
-            aiContent.innerHTML += `<div class="ai-chat-bubble" style="background: #fff5f5; padding: 12px; border-radius: 10px; border-left: 4px solid #ff4d4d; margin-bottom: 15px;">🤖 <strong>AI Tutor:</strong> "Não encontrei correlação para '${query}'. Tente um conceito como 'Espaço' ou 'Forma'."</div>`;
+            aiContent.innerHTML += `<div class="ai-chat-bubble" style="background: #fff5f5; padding: 12px; border-radius: 10px; border-left: 4px solid #ff4d4d; margin-bottom: 15px;">🤖 <strong>AI Tutor:</strong> "Não encontrei o termo '${query}' no dicionário ou biblioteca."</div>`;
         }
     }
 
