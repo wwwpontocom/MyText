@@ -57,6 +57,30 @@ function analyzePastedContent(text) {
             <br><br><b>O que deseja fazer agora?</b> Digite <b>"resumo"</b> para ver os pontos principais ou pergunte sobre a <b>"importância"</b> do que foi dito.`;
 }
 
+// Logic to unify two concepts
+function handleRelationIntent(text, brain) {
+    if (!text.startsWith("relacione")) return null;
+
+    const terms = text.replace("relacione", "").split("com").map(t => t.trim());
+    if (terms.length < 2) return "Para relacionar, use o formato: 'relacione [termo A] com [termo B]'.";
+
+    const entryA = Object.values(brain).find(e => e.titulo.toLowerCase().includes(terms[0]));
+    const entryB = Object.values(brain).find(e => e.titulo.toLowerCase().includes(terms[1]));
+
+    if (entryA && entryB) {
+        const logicA = entryA.resumo || entryA.definicao;
+        const logicB = entryB.resumo || entryB.definicao;
+        
+        const unifiedThought = `Ao conectarmos <b>${entryA.titulo}</b> e <b>${entryB.titulo}</b>, estabelecemos uma síntese onde ${logicA.toLowerCase().replace('.', '')} encontra suporte na premissa de que ${logicB.toLowerCase()}. Essa relação é vital para a harmonia do projeto.`;
+
+        return {
+            thought: unifiedThought,
+            sources: [entryA, entryB]
+        };
+    }
+    return "Não consegui encontrar um ou ambos os termos para criar uma relação.";
+}
+
 function handleIntents(text, brain) {
     const greetings = ["ola", "olá", "bom dia", "boa tarde", "boa noite", "oi"];
     if (greetings.includes(text)) {
@@ -83,15 +107,15 @@ function synthesizeAnalysis(text, entry) {
             
             return `<b>Principais Pontos Identificados:</b>
                     <ul style="margin: 10px 0; padding-left: 20px;">${keyPoints}</ul>
-                    <b>Resumo da Análise:</b> O texto apresenta uma narrativa técnica focada em detalhes estruturais, totalizando ${entry.fullContent.length} caracteres de fundamentação teórica.`;
+                    <b>Resumo da Análise:</b> O texto apresenta uma narrativa técnica focada em detalhes estruturais.`;
         }
         return `O resumo de <b>${entry.titulo}</b> é: ${entry.resumo || entry.definicao}.`;
     }
 
     const analysisPrompts = [
-        { key: "importancia", response: `A importância de <b>${entry.titulo}</b> reside no fato de que ${(entry.resumo || entry.definicao).toLowerCase()}. Sem isso, o equilíbrio arquitetônico ficaria comprometido.` },
-        { key: "como funciona", response: `O funcionamento de <b>${entry.titulo}</b> se dá através da articulação de elementos que ${(entry.resumo || entry.definicao).toLowerCase()}, permitindo uma leitura clara do espaço.` },
-        { key: "significa", response: `Em termos conceituais, <b>${entry.titulo}</b> significa ${(entry.resumo || entry.definicao).toLowerCase()}. É a base para entender este volume.` }
+        { key: "importancia", response: `A importância de <b>${entry.titulo}</b> reside no fato de que ${(entry.resumo || entry.definicao).toLowerCase()}.` },
+        { key: "como funciona", response: `O funcionamento de <b>${entry.titulo}</b> se dá através da articulação de elementos que ${(entry.resumo || entry.definicao).toLowerCase()}.` },
+        { key: "significa", response: `Em termos conceituais, <b>${entry.titulo}</b> significa ${(entry.resumo || entry.definicao).toLowerCase()}.` }
     ];
     for (let p of analysisPrompts) {
         if (text.includes(p.key)) return p.response;
@@ -103,8 +127,7 @@ function getSmartIntroduction(entry) {
     const openers = [
         `Interessante você perguntar sobre <b>${entry.titulo}</b>. Basicamente, `,
         `Certamente! Ao analisarmos <b>${entry.titulo}</b>, percebemos que `,
-        `No contexto da arquitetura, <b>${entry.titulo}</b> é fundamental porque `,
-        `Explorar <b>${entry.titulo}</b> nos ajuda a entender como `
+        `No contexto da arquitetura, <b>${entry.titulo}</b> é fundamental porque `
     ];
     const closers = [" Analise os detalhes técnicos abaixo:", " Veja como isso se aplica no design:", " Note os princípios fundamentais:"];
     const rIntro = openers[Math.floor(Math.random() * openers.length)];
@@ -119,8 +142,28 @@ window.askSmartAI = function(query) {
     const brain = getLibraryData();
 
     aiContent.innerHTML += `<div class="user-chat-bubble" style="background: #e9ecef; padding: 10px; border-radius: 10px; margin-bottom: 15px; border-right: 4px solid #adb5bd; font-family: sans-serif; font-size: 0.9rem; white-space: pre-wrap;">👤 <strong>Você:</strong> "${query}"</div>`;
-    
     aiContent.scrollTop = aiContent.scrollHeight;
+
+    // --- RELATION LOGIC CHECK ---
+    const relationData = handleRelationIntent(text, brain);
+    if (relationData) {
+        if (typeof relationData === 'string') {
+            aiContent.innerHTML += `<div class="ai-chat-bubble" style="background: #fff5f5; padding: 12px; border-radius: 10px; border-left: 4px solid #ff4d4d; margin-bottom: 15px;">🤖 <strong>AI Tutor:</strong> "${relationData}"</div>`;
+        } else {
+            aiContent.innerHTML += `
+                <div class="ai-chat-bubble" style="background: #f0f7ff; padding: 15px; border-radius: 12px; border-left: 5px solid #007bff; margin-bottom: 10px;">
+                    🤖 <strong>Pensamento Unificado:</strong> ${relationData.thought}
+                </div>`;
+            relationData.sources.forEach(src => {
+                aiContent.innerHTML += `
+                <div class="encyclopedia-entry" style="padding: 10px; border-radius: 8px; background: #fafafa; border: 1px solid #eee; margin-bottom: 10px; font-size: 0.85rem;">
+                    <strong>Fonte: ${src.titulo}</strong><br>${src.html_content || src.definicao}
+                </div>`;
+            });
+        }
+        aiContent.scrollTop = aiContent.scrollHeight;
+        return;
+    }
 
     if (query.length > 200) {
         const analysisMsg = analyzePastedContent(query);
@@ -160,13 +203,9 @@ window.askSmartAI = function(query) {
         if (bestMatch && highestScore > 0) {
             lastResult = bestMatch;
             const isDict = !!bestMatch.definicao;
-            let suggestions = Object.keys(brain).filter(k => k !== bestMatch.key && brain[k].fase === bestMatch.fase).slice(0, 3);
-            let suggestionHtml = suggestions.length > 0 ? `<div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:5px;"><small>Relacionados:</small> ` + suggestions.map(k => `<button onclick="triggerSearch('${brain[k].titulo}')" style="background:#fff; border:1px solid var(--ai-accent); border-radius:10px; cursor:pointer; font-size:10px; margin-right:3px;">${brain[k].titulo}</button>`).join('') + `</div>` : "";
-
             aiContent.innerHTML += `
                 <div class="ai-chat-bubble" style="background: #f8faff; padding: 15px; border-radius: 12px; border-left: 5px solid var(--ai-accent); margin-bottom: 10px;">
                     🤖 <strong>AI Tutor:</strong> ${getSmartIntroduction(bestMatch)}
-                    ${suggestionHtml}
                 </div>
                 <div class="encyclopedia-entry" style="padding: 15px; border-radius: 12px; background: #fff; border: 1px solid #eee; margin-bottom: 15px;">
                     <strong>${isDict ? '📖 Dicionário:' : (bestMatch.icone || '📖') + ' ' + bestMatch.titulo}</strong><hr>
@@ -177,7 +216,6 @@ window.askSmartAI = function(query) {
             aiContent.innerHTML += `<div class="ai-chat-bubble" style="background: #fff5f5; padding: 12px; border-radius: 10px; border-left: 4px solid #ff4d4d; margin-bottom: 15px;">🤖 <strong>AI Tutor:</strong> "Não encontrei o termo '${query}' no dicionário ou biblioteca."</div>`;
         }
     }
-
     aiContent.scrollTop = aiContent.scrollHeight;
 };
 
