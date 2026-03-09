@@ -52,8 +52,8 @@ function analyzePastedContent(text) {
         isCustom: true
     };
 
-    return `Li o conteúdo que você colou (${wordCount} palavras). Parece ser um texto técnico ou literário. 
-            <b>Gostaria que eu fizesse um resumo, extraísse os conceitos principais ou analisasse a estrutura deste trecho?</b>`;
+    return `Li o conteúdo que você colou (${wordCount} palavras). Identifiquei a estrutura do texto. 
+            <br><br><b>O que deseja fazer agora?</b> Digite <b>"resumo"</b> para ver os pontos principais ou pergunte sobre a <b>"importância"</b> do que foi dito.`;
 }
 
 function handleIntents(text, brain) {
@@ -75,10 +75,15 @@ function handleIntents(text, brain) {
 }
 
 function synthesizeAnalysis(text, entry) {
-    // Check for "resumo" command specifically
     if (text.includes("resumo")) {
         if (entry.isCustom) {
-            return `O resumo deste conteúdo externo foca em processar as ${entry.fullContent.split(/\s+/).length} palavras para identificar os eixos temáticos principais. O texto aborda inicialmente: ${entry.fullContent.substring(0, 200)}...`;
+            // Simulated "Key Points" Identification Logic
+            const sentences = entry.fullContent.split(/[.!?]/).filter(s => s.trim().length > 20);
+            const keyPoints = sentences.slice(0, 3).map(s => `<li>${s.trim()}</li>`).join('');
+            
+            return `<b>Principais Pontos Identificados:</b>
+                    <ul style="margin: 10px 0; padding-left: 20px;">${keyPoints}</ul>
+                    <b>Resumo da Análise:</b> O texto apresenta uma narrativa técnica focada em detalhes estruturais, totalizando ${entry.fullContent.length} caracteres de fundamentação teórica.`;
         }
         return `O resumo de <b>${entry.titulo}</b> é: ${entry.resumo}.`;
     }
@@ -112,7 +117,6 @@ window.askSmartAI = function(query) {
     const text = query.toLowerCase().trim();
     const brain = getLibraryData();
 
-    // 0. Append User Prompt Bubble (Removed truncation to show full text)
     aiContent.innerHTML += `<div class="user-chat-bubble" style="background: #e9ecef; padding: 10px; border-radius: 10px; margin-bottom: 15px; border-right: 4px solid #adb5bd; font-family: sans-serif; font-size: 0.9rem; white-space: pre-wrap;">👤 <strong>Você:</strong> "${query}"</div>`;
     
     aiContent.scrollTop = aiContent.scrollHeight;
