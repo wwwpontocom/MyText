@@ -26,9 +26,12 @@ const aiSearch = document.getElementById('ai-search');
 
 function getLibraryData() {
     const brain = {};
+    // Relating contents from all data sources
     if (typeof BIBLIOTECA_ENCICLOPEDIA !== 'undefined') Object.assign(brain, BIBLIOTECA_ENCICLOPEDIA);
     if (typeof BIBLIOTECA_LIVRO !== 'undefined') Object.assign(brain, BIBLIOTECA_LIVRO);
     if (typeof BIBLIOTECA_DICIONARIO !== 'undefined') Object.assign(brain, BIBLIOTECA_DICIONARIO);
+    if (typeof BIBLIOTECA_VOCABULARIO !== 'undefined') Object.assign(brain, BIBLIOTECA_VOCABULARIO);
+    if (typeof BIBLIOTECA_FORM !== 'undefined') Object.assign(brain, BIBLIOTECA_FORM);
     return brain;
 }
 
@@ -57,28 +60,34 @@ function analyzePastedContent(text) {
             <br><br><b>O que deseja fazer agora?</b> Digite <b>"resumo"</b> para ver os pontos principais ou pergunte sobre a <b>"importância"</b> do que foi dito.`;
 }
 
-// Logic to unify two concepts
+// Advanced logic to unify multiple data sources into a new logic
 function handleRelationIntent(text, brain) {
-    if (!text.startsWith("relacione")) return null;
+    if (!text.includes("relacione")) return null;
 
-    const terms = text.replace("relacione", "").split("com").map(t => t.trim());
-    if (terms.length < 2) return "Para relacionar, use o formato: 'relacione [termo A] com [termo B]'.";
+    // Supports "relacione [A] com [B]" or just typing the terms
+    const parts = text.replace("relacione", "").split("com").map(t => t.trim());
+    if (parts.length < 2) return "Para unificar conhecimentos, use: 'relacione [termo A] com [termo B]'.";
 
-    const entryA = Object.values(brain).find(e => e.titulo.toLowerCase().includes(terms[0]));
-    const entryB = Object.values(brain).find(e => e.titulo.toLowerCase().includes(terms[1]));
+    const entryA = Object.values(brain).find(e => e.titulo.toLowerCase().includes(parts[0]));
+    const entryB = Object.values(brain).find(e => e.titulo.toLowerCase().includes(parts[1]));
 
     if (entryA && entryB) {
-        const logicA = entryA.resumo || entryA.definicao;
-        const logicB = entryB.resumo || entryB.definicao;
-        
-        const unifiedThought = `Ao conectarmos <b>${entryA.titulo}</b> e <b>${entryB.titulo}</b>, estabelecemos uma síntese onde ${logicA.toLowerCase().replace('.', '')} encontra suporte na premissa de que ${logicB.toLowerCase()}. Essa relação é vital para a harmonia do projeto.`;
+        const descA = (entryA.resumo || entryA.definicao || "").toLowerCase();
+        const descB = (entryB.resumo || entryB.definicao || "").toLowerCase();
+
+        // Extracting "Main Points" (Key architectural attributes)
+        const pointA = descA.split('.')[0]; 
+        const pointB = descB.split('.')[0];
+
+        // Generating New Unified Logic
+        const unifiedLogic = `<b>Nova Síntese Arquitetônica:</b> A convergência entre <b>${entryA.titulo}</b> e <b>${entryB.titulo}</b> revela que a lógica de ${pointA} é intrinsecamente potencializada pela premissa de ${pointB}. No design, essa unificação transforma o conceito em uma solução técnica onde a função de um justifica a estética do outro.`;
 
         return {
-            thought: unifiedThought,
+            thought: unifiedLogic,
             sources: [entryA, entryB]
         };
     }
-    return "Não consegui encontrar um ou ambos os termos para criar uma relação.";
+    return "Um dos termos não foi localizado nas bibliotecas (Dicionário, Enciclopédia, Vocabulário ou Form).";
 }
 
 function handleIntents(text, brain) {
@@ -144,7 +153,7 @@ window.askSmartAI = function(query) {
     aiContent.innerHTML += `<div class="user-chat-bubble" style="background: #e9ecef; padding: 10px; border-radius: 10px; margin-bottom: 15px; border-right: 4px solid #adb5bd; font-family: sans-serif; font-size: 0.9rem; white-space: pre-wrap;">👤 <strong>Você:</strong> "${query}"</div>`;
     aiContent.scrollTop = aiContent.scrollHeight;
 
-    // --- RELATION LOGIC CHECK ---
+    // --- RELATION & UNIFICATION LOGIC ---
     const relationData = handleRelationIntent(text, brain);
     if (relationData) {
         if (typeof relationData === 'string') {
@@ -152,12 +161,12 @@ window.askSmartAI = function(query) {
         } else {
             aiContent.innerHTML += `
                 <div class="ai-chat-bubble" style="background: #f0f7ff; padding: 15px; border-radius: 12px; border-left: 5px solid #007bff; margin-bottom: 10px;">
-                    🤖 <strong>Pensamento Unificado:</strong> ${relationData.thought}
+                    🤖 <strong>Pensamento Unificado:</strong><br>${relationData.thought}
                 </div>`;
             relationData.sources.forEach(src => {
                 aiContent.innerHTML += `
                 <div class="encyclopedia-entry" style="padding: 10px; border-radius: 8px; background: #fafafa; border: 1px solid #eee; margin-bottom: 10px; font-size: 0.85rem;">
-                    <strong>Fonte: ${src.titulo}</strong><br>${src.html_content || src.definicao}
+                    <strong>Fonte (${src.titulo}):</strong> ${src.html_content || src.definicao}
                 </div>`;
             });
         }
