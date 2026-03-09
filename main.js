@@ -88,10 +88,15 @@ window.askSmartAI = function(query) {
     const text = query.toLowerCase().trim();
     const brain = getLibraryData();
 
+    // 0. Render User Prompt Bubble
+    const userBubble = `<div class="user-chat-bubble" style="background: #e9ecef; padding: 10px; border-radius: 10px; margin-bottom: 15px; align-self: flex-end; border-right: 4px solid #adb5bd; font-family: sans-serif; font-size: 0.9rem;">👤 <strong>Você:</strong> "${query}"</div>`;
+    
+    let finalHtml = userBubble;
+
     // STEP 1: Intent Check
     const intentResponse = handleIntents(text, brain);
     if (intentResponse) {
-        aiContent.innerHTML = `<div class="ai-chat-bubble" style="background: #f0f4f8; padding: 12px; border-radius: 10px; border-left: 4px solid var(--ai-accent);">🤖 <strong>AI Tutor:</strong> "${intentResponse}"</div>`;
+        aiContent.innerHTML = finalHtml + `<div class="ai-chat-bubble" style="background: #f0f4f8; padding: 12px; border-radius: 10px; border-left: 4px solid var(--ai-accent);">🤖 <strong>AI Tutor:</strong> "${intentResponse}"</div>`;
         return;
     }
 
@@ -99,7 +104,7 @@ window.askSmartAI = function(query) {
     if (lastResult) {
         const analysis = synthesizeAnalysis(text, lastResult);
         if (analysis) {
-            aiContent.innerHTML = `
+            aiContent.innerHTML = finalHtml + `
                 <div class="ai-chat-bubble" style="background: #eef9f0; padding: 12px; border-radius: 10px; border-left: 4px solid #28a745; margin-bottom: 10px;">
                     🤖 <strong>Análise:</strong> "${analysis}"
                 </div>
@@ -129,7 +134,7 @@ window.askSmartAI = function(query) {
         let suggestions = Object.keys(brain).filter(k => k !== bestMatch.key && brain[k].fase === bestMatch.fase).slice(0, 3);
         let suggestionHtml = suggestions.length > 0 ? `<div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:5px;"><small>Relacionados:</small> ` + suggestions.map(k => `<button onclick="triggerSearch('${brain[k].titulo}')" style="background:#fff; border:1px solid var(--ai-accent); border-radius:10px; cursor:pointer; font-size:10px; margin-right:3px;">${brain[k].titulo}</button>`).join('') + `</div>` : "";
 
-        aiContent.innerHTML = `
+        aiContent.innerHTML = finalHtml + `
             <div class="ai-chat-bubble" style="background: #f8faff; padding: 15px; border-radius: 12px; border-left: 5px solid var(--ai-accent); margin-bottom: 15px;">
                 🤖 <strong>AI Tutor:</strong> ${getSmartIntroduction(bestMatch)}
                 ${suggestionHtml}
@@ -138,13 +143,18 @@ window.askSmartAI = function(query) {
                 <strong>${bestMatch.icone || '📖'} ${bestMatch.titulo}</strong><hr>${bestMatch.html_content}
             </div>`;
     } else {
-        aiContent.innerHTML = `<div class="ai-chat-bubble" style="background: #fff5f5; padding: 12px; border-radius: 10px; border-left: 4px solid #ff4d4d;">🤖 <strong>AI Tutor:</strong> "Poderia reformular ou citar um conceito específico de arquitetura?"</div>`;
+        aiContent.innerHTML = finalHtml + `<div class="ai-chat-bubble" style="background: #fff5f5; padding: 12px; border-radius: 10px; border-left: 4px solid #ff4d4d;">🤖 <strong>AI Tutor:</strong> "Poderia reformular ou citar um conceito específico de arquitetura?"</div>`;
     }
 };
 
 if (aiSearch) {
-    aiSearch.oninput = (e) => window.askSmartAI(e.target.value);
-    aiSearch.onkeypress = (e) => { if (e.key === 'Enter') window.askSmartAI(e.target.value); };
+    aiSearch.onkeypress = (e) => { 
+        if (e.key === 'Enter') {
+            const val = e.target.value;
+            window.askSmartAI(val);
+            e.target.value = ""; // Clear input after sending
+        }
+    };
 }
 
 // 4. Export & Template Logic (Kept Intact)
