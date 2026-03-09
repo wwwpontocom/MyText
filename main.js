@@ -88,63 +88,63 @@ window.askSmartAI = function(query) {
     const text = query.toLowerCase().trim();
     const brain = getLibraryData();
 
-    // 0. Render User Prompt Bubble
-    const userBubble = `<div class="user-chat-bubble" style="background: #e9ecef; padding: 10px; border-radius: 10px; margin-bottom: 15px; align-self: flex-end; border-right: 4px solid #adb5bd; font-family: sans-serif; font-size: 0.9rem;">👤 <strong>Você:</strong> "${query}"</div>`;
+    // 0. Append User Prompt Bubble (+= instead of =)
+    aiContent.innerHTML += `<div class="user-chat-bubble" style="background: #e9ecef; padding: 10px; border-radius: 10px; margin-bottom: 15px; border-right: 4px solid #adb5bd; font-family: sans-serif; font-size: 0.9rem;">👤 <strong>Você:</strong> "${query}"</div>`;
     
-    let finalHtml = userBubble;
+    // Helper to scroll to bottom after user message
+    aiContent.scrollTop = aiContent.scrollHeight;
 
     // STEP 1: Intent Check
     const intentResponse = handleIntents(text, brain);
     if (intentResponse) {
-        aiContent.innerHTML = finalHtml + `<div class="ai-chat-bubble" style="background: #f0f4f8; padding: 12px; border-radius: 10px; border-left: 4px solid var(--ai-accent);">🤖 <strong>AI Tutor:</strong> "${intentResponse}"</div>`;
-        return;
-    }
-
+        aiContent.innerHTML += `<div class="ai-chat-bubble" style="background: #f0f4f8; padding: 12px; border-radius: 10px; border-left: 4px solid var(--ai-accent); margin-bottom: 15px;">🤖 <strong>AI Tutor:</strong> "${intentResponse}"</div>`;
+    } 
     // STEP 2: Analytical Question Check
-    if (lastResult) {
+    else if (lastResult && synthesizeAnalysis(text, lastResult)) {
         const analysis = synthesizeAnalysis(text, lastResult);
-        if (analysis) {
-            aiContent.innerHTML = finalHtml + `
-                <div class="ai-chat-bubble" style="background: #eef9f0; padding: 12px; border-radius: 10px; border-left: 4px solid #28a745; margin-bottom: 10px;">
-                    🤖 <strong>Análise:</strong> "${analysis}"
-                </div>
-                <div class="encyclopedia-entry" style="padding:10px; border:1px solid #eee; background:#fff; font-size:0.9rem;">
-                    <strong>${lastResult.titulo}</strong><hr>${lastResult.html_content}
-                </div>`;
-            return;
-        }
-    }
-
-    // STEP 3: Search Logic
-    let bestMatch = null;
-    let highestScore = 0;
-    for (const key in brain) {
-        let score = 0;
-        const entry = brain[key];
-        if (entry.keywords?.some(k => text.includes(k.toLowerCase()))) score += 20;
-        if (entry.titulo?.toLowerCase().includes(text)) score += 15;
-        if (score > highestScore) {
-            highestScore = score;
-            bestMatch = entry;
-        }
-    }
-
-    if (bestMatch && highestScore > 0) {
-        lastResult = bestMatch;
-        let suggestions = Object.keys(brain).filter(k => k !== bestMatch.key && brain[k].fase === bestMatch.fase).slice(0, 3);
-        let suggestionHtml = suggestions.length > 0 ? `<div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:5px;"><small>Relacionados:</small> ` + suggestions.map(k => `<button onclick="triggerSearch('${brain[k].titulo}')" style="background:#fff; border:1px solid var(--ai-accent); border-radius:10px; cursor:pointer; font-size:10px; margin-right:3px;">${brain[k].titulo}</button>`).join('') + `</div>` : "";
-
-        aiContent.innerHTML = finalHtml + `
-            <div class="ai-chat-bubble" style="background: #f8faff; padding: 15px; border-radius: 12px; border-left: 5px solid var(--ai-accent); margin-bottom: 15px;">
-                🤖 <strong>AI Tutor:</strong> ${getSmartIntroduction(bestMatch)}
-                ${suggestionHtml}
+        aiContent.innerHTML += `
+            <div class="ai-chat-bubble" style="background: #eef9f0; padding: 12px; border-radius: 10px; border-left: 4px solid #28a745; margin-bottom: 10px;">
+                🤖 <strong>Análise:</strong> "${analysis}"
             </div>
-            <div class="encyclopedia-entry" style="padding: 15px; border-radius: 12px; background: #fff; border: 1px solid #eee;">
-                <strong>${bestMatch.icone || '📖'} ${bestMatch.titulo}</strong><hr>${bestMatch.html_content}
+            <div class="encyclopedia-entry" style="padding:10px; border:1px solid #eee; background:#fff; font-size:0.9rem; margin-bottom: 15px; border-radius: 8px;">
+                <strong>${lastResult.titulo}</strong><hr>${lastResult.html_content}
             </div>`;
-    } else {
-        aiContent.innerHTML = finalHtml + `<div class="ai-chat-bubble" style="background: #fff5f5; padding: 12px; border-radius: 10px; border-left: 4px solid #ff4d4d;">🤖 <strong>AI Tutor:</strong> "Poderia reformular ou citar um conceito específico de arquitetura?"</div>`;
+    } 
+    // STEP 3: Search Logic
+    else {
+        let bestMatch = null;
+        let highestScore = 0;
+        for (const key in brain) {
+            let score = 0;
+            const entry = brain[key];
+            if (entry.keywords?.some(k => text.includes(k.toLowerCase()))) score += 20;
+            if (entry.titulo?.toLowerCase().includes(text)) score += 15;
+            if (score > highestScore) {
+                highestScore = score;
+                bestMatch = entry;
+            }
+        }
+
+        if (bestMatch && highestScore > 0) {
+            lastResult = bestMatch;
+            let suggestions = Object.keys(brain).filter(k => k !== bestMatch.key && brain[k].fase === bestMatch.fase).slice(0, 3);
+            let suggestionHtml = suggestions.length > 0 ? `<div style="margin-top:10px; border-top:1px dashed #ccc; padding-top:5px;"><small>Relacionados:</small> ` + suggestions.map(k => `<button onclick="triggerSearch('${brain[k].titulo}')" style="background:#fff; border:1px solid var(--ai-accent); border-radius:10px; cursor:pointer; font-size:10px; margin-right:3px;">${brain[k].titulo}</button>`).join('') + `</div>` : "";
+
+            aiContent.innerHTML += `
+                <div class="ai-chat-bubble" style="background: #f8faff; padding: 15px; border-radius: 12px; border-left: 5px solid var(--ai-accent); margin-bottom: 10px;">
+                    🤖 <strong>AI Tutor:</strong> ${getSmartIntroduction(bestMatch)}
+                    ${suggestionHtml}
+                </div>
+                <div class="encyclopedia-entry" style="padding: 15px; border-radius: 12px; background: #fff; border: 1px solid #eee; margin-bottom: 15px;">
+                    <strong>${bestMatch.icone || '📖'} ${bestMatch.titulo}</strong><hr>${bestMatch.html_content}
+                </div>`;
+        } else {
+            aiContent.innerHTML += `<div class="ai-chat-bubble" style="background: #fff5f5; padding: 12px; border-radius: 10px; border-left: 4px solid #ff4d4d; margin-bottom: 15px;">🤖 <strong>AI Tutor:</strong> "Não encontrei correlação para '${query}'. Tente um conceito como 'Espaço' ou 'Forma'."</div>`;
+        }
     }
+
+    // Auto-scroll to bottom after AI responds
+    aiContent.scrollTop = aiContent.scrollHeight;
 };
 
 if (aiSearch) {
@@ -152,7 +152,7 @@ if (aiSearch) {
         if (e.key === 'Enter') {
             const val = e.target.value;
             window.askSmartAI(val);
-            e.target.value = ""; // Clear input after sending
+            e.target.value = ""; 
         }
     };
 }
