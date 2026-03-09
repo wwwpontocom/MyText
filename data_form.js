@@ -1,7 +1,7 @@
 // 1. Initial Library Definition
 let BIBLIOTECA_LIVRO = {
     "form_space_order": {
-        keywords: ["arquitetura", "forma", "espaço", "ordem", "ching", "proporção", "ritmo", "hierarquia", "simetria", "Ponto Indica uma posição no espaço Linha Um ponto estendido possui comprimento direção e posição Plano Uma linha estendida possui largura e comprimento Volume Um plano estendido possui profundidade"],
+        keywords: ["arquitetura", "forma", "espaço", "ordem", "ching", "proporção", "ritmo", "hierarquia", "simetria", "ponto", "linha", "comprimento", "direção", "posição", "plano", "largura", "comprimento", "volume", "profundidade"],
         fase: "TEORIA DA ARQUITETURA",
         titulo: "Forma, Espaço e Ordem",
         icone: "🏛️",
