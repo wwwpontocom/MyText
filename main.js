@@ -40,17 +40,15 @@ window.triggerSearch = function(topic) {
 
 // --- CORE SMART LOGIC ---
 
-// New Helper: Handles analysis of long pasted text
 function analyzePastedContent(text) {
     const wordCount = text.split(/\s+/).length;
-    // Simple logic to "simulate" reading: extract first sentence and key terms
     const preview = text.substring(0, 150) + "...";
     
-    // Create a temporary "entry" for the chat memory
     lastResult = {
         titulo: "Conteúdo Externo Analisado",
         resumo: `um fragmento de texto com aproximadamente ${wordCount} palavras.`,
         html_content: `<div style="font-style: italic; color: #555;">"${preview}"</div>`,
+        fullContent: text,
         isCustom: true
     };
 
@@ -77,6 +75,14 @@ function handleIntents(text, brain) {
 }
 
 function synthesizeAnalysis(text, entry) {
+    // Check for "resumo" command specifically
+    if (text.includes("resumo")) {
+        if (entry.isCustom) {
+            return `O resumo deste conteúdo externo foca em processar as ${entry.fullContent.split(/\s+/).length} palavras para identificar os eixos temáticos principais. O texto aborda inicialmente: ${entry.fullContent.substring(0, 200)}...`;
+        }
+        return `O resumo de <b>${entry.titulo}</b> é: ${entry.resumo}.`;
+    }
+
     const analysisPrompts = [
         { key: "importancia", response: `A importância de <b>${entry.titulo}</b> reside no fato de que ${entry.resumo.toLowerCase()}. Sem isso, o equilíbrio arquitetônico ficaria comprometido.` },
         { key: "como funciona", response: `O funcionamento de <b>${entry.titulo}</b> se dá através da articulação de elementos que ${entry.resumo.toLowerCase()}, permitindo uma leitura clara do espaço.` },
@@ -106,12 +112,11 @@ window.askSmartAI = function(query) {
     const text = query.toLowerCase().trim();
     const brain = getLibraryData();
 
-    // 0. Append User Prompt Bubble
-    aiContent.innerHTML += `<div class="user-chat-bubble" style="background: #e9ecef; padding: 10px; border-radius: 10px; margin-bottom: 15px; border-right: 4px solid #adb5bd; font-family: sans-serif; font-size: 0.9rem;">👤 <strong>Você:</strong> "${query.substring(0, 100)}${query.length > 100 ? '...' : ''}"</div>`;
+    // 0. Append User Prompt Bubble (Removed truncation to show full text)
+    aiContent.innerHTML += `<div class="user-chat-bubble" style="background: #e9ecef; padding: 10px; border-radius: 10px; margin-bottom: 15px; border-right: 4px solid #adb5bd; font-family: sans-serif; font-size: 0.9rem; white-space: pre-wrap;">👤 <strong>Você:</strong> "${query}"</div>`;
     
     aiContent.scrollTop = aiContent.scrollHeight;
 
-    // --- NEW: LONG TEXT ANALYSIS DETECTION ---
     if (query.length > 200) {
         const analysisMsg = analyzePastedContent(query);
         aiContent.innerHTML += `<div class="ai-chat-bubble" style="background: #fdfae6; padding: 12px; border-radius: 10px; border-left: 4px solid #f1c40f; margin-bottom: 15px;">🤖 <strong>AI Analista:</strong> ${analysisMsg}</div>`;
@@ -119,12 +124,10 @@ window.askSmartAI = function(query) {
         return;
     }
 
-    // STEP 1: Intent Check
     const intentResponse = handleIntents(text, brain);
     if (intentResponse) {
         aiContent.innerHTML += `<div class="ai-chat-bubble" style="background: #f0f4f8; padding: 12px; border-radius: 10px; border-left: 4px solid var(--ai-accent); margin-bottom: 15px;">🤖 <strong>AI Tutor:</strong> "${intentResponse}"</div>`;
     } 
-    // STEP 2: Analytical Question Check
     else if (lastResult && synthesizeAnalysis(text, lastResult)) {
         const analysis = synthesizeAnalysis(text, lastResult);
         aiContent.innerHTML += `
@@ -135,7 +138,6 @@ window.askSmartAI = function(query) {
                 <strong>${lastResult.titulo}</strong><hr>${lastResult.html_content}
             </div>`;
     } 
-    // STEP 3: Search Logic
     else {
         let bestMatch = null;
         let highestScore = 0;
