@@ -29,13 +29,32 @@ function getLibraryData() {
     return brain;
 }
 
-// Helper to trigger search from suggested buttons
 window.triggerSearch = function(topic) {
     if (aiSearch) {
         aiSearch.value = topic;
         window.askSmartAI(topic);
     }
 };
+
+// New Helper: Generates a "Professor-like" introduction
+function getSmartIntroduction(entry) {
+    const intros = [
+        `Interessante você perguntar sobre <b>${entry.titulo}</b>. Basicamente, trata-se de `,
+        `Certamente! Ao analisarmos <b>${entry.titulo}</b>, percebemos que `,
+        `No contexto da arquitetura, <b>${entry.titulo}</b> é fundamental porque `,
+        `Explorar <b>${entry.titulo}</b> nos ajuda a entender como `
+    ];
+    const conclusion = [
+        " Analise os detalhes técnicos abaixo:",
+        " Veja como isso se aplica no design:",
+        " Note os princípios fundamentais descritos aqui:"
+    ];
+    
+    const randomIntro = intros[Math.floor(Math.random() * intros.length)];
+    const randomEnd = conclusion[Math.floor(Math.random() * conclusion.length)];
+    
+    return `${randomIntro}${entry.resumo.charAt(0).toLowerCase() + entry.resumo.slice(1)}${randomEnd}`;
+}
 
 window.askSmartAI = function(query) {
     if (!query || query.length < 2) return;
@@ -46,7 +65,7 @@ window.askSmartAI = function(query) {
     let highestScore = 0;
     let suggestions = [];
 
-    // 1. Search Logic
+    // 1. Advanced Search Logic
     for (const key in brain) {
         let score = 0;
         const entry = brain[key];
@@ -54,38 +73,34 @@ window.askSmartAI = function(query) {
             entry.keywords.forEach(k => { if (text.includes(k.toLowerCase())) score += 20; });
         }
         if (entry.titulo && entry.titulo.toLowerCase().includes(text)) score += 15;
-        if (entry.html_content && entry.html_content.toLowerCase().includes(text)) score += 5;
+        // Boost score if the query exactly matches a keyword
+        if (entry.keywords && entry.keywords.includes(text)) score += 30;
 
         if (score > highestScore) {
             highestScore = score;
             bestMatch = entry;
-            bestMatch.key = key; // Store key to avoid suggesting itself
+            bestMatch.key = key;
         }
     }
 
-    // 2. Suggestion Logic (Find 3 related items)
+    // 2. Suggestion Logic
     if (bestMatch) {
         suggestions = Object.keys(brain)
-            .filter(key => key !== bestMatch.key) // Don't suggest current topic
-            .filter(key => {
-                // Check if they share keywords or are in the same phase/category
-                const entry = brain[key];
-                return entry.fase === bestMatch.fase || 
-                       entry.keywords.some(k => bestMatch.keywords.includes(k));
-            })
-            .slice(0, 3); // Limit to 3 suggestions
+            .filter(key => key !== bestMatch.key)
+            .filter(key => brain[key].fase === bestMatch.fase || brain[key].keywords.some(k => bestMatch.keywords.includes(k)))
+            .slice(0, 3);
     }
 
-    // 3. Conversational Logic (The Chat Layer)
+    // 3. UI Rendering (Smart Response)
     if (bestMatch && highestScore > 0) {
         let suggestionHtml = "";
         if (suggestions.length > 0) {
             suggestionHtml = `
-                <div style="margin-top: 12px; border-top: 1px dashed #ccc; padding-top: 8px;">
-                    <small style="display:block; margin-bottom: 5px; color: #666;">Tópicos relacionados:</small>
+                <div style="margin-top: 12px; border-top: 1px dashed rgba(0,0,0,0.1); padding-top: 8px;">
+                    <small style="display:block; margin-bottom: 5px; color: #666; font-style: normal;">Para aprofundar, veja também:</small>
                     ${suggestions.map(key => `
                         <button onclick="triggerSearch('${brain[key].titulo}')" 
-                                style="background: #e3f2fd; border: 1px solid #bbdefb; border-radius: 15px; padding: 4px 10px; font-size: 11px; cursor: pointer; margin-right: 5px; color: #1976d2;">
+                                style="background: white; border: 1px solid var(--ai-accent); border-radius: 12px; padding: 3px 10px; font-size: 11px; cursor: pointer; margin-right: 5px; color: var(--ai-accent); transition: 0.2s;">
                             ${brain[key].icone || '🔍'} ${brain[key].titulo}
                         </button>
                     `).join('')}
@@ -93,26 +108,27 @@ window.askSmartAI = function(query) {
             `;
         }
 
-        const aiIntroduction = `
-            <div class="ai-chat-bubble" style="background: #f0f4f8; padding: 12px; border-radius: 10px; border-left: 4px solid var(--ai-accent); margin-bottom: 15px; font-style: italic;">
-                🤖 <strong>AI Tutor:</strong> "Sobre <b>${bestMatch.titulo}</b>, posso te dizer que ${bestMatch.resumo.toLowerCase()} 
-                Aqui estão os detalhes técnicos que encontrei nos meus arquivos:"
-                ${suggestionHtml}
-            </div>
-        `;
+        const aiIntroText = getSmartIntroduction(bestMatch);
 
         aiContent.innerHTML = `
-            ${aiIntroduction}
-            <div class="encyclopedia-entry" style="padding: 10px; border: 1px solid #eee; border-radius: 8px; background: #fff; line-height: 1.6;">
-                <small style="color: #888;">FONTE: Pág. ${bestMatch.pagina || '---'}</small><br>
-                <strong>${bestMatch.icone || '📖'} ${bestMatch.titulo}</strong><hr>
-                ${bestMatch.html_content}
+            <div class="ai-chat-bubble" style="background: #f8faff; padding: 15px; border-radius: 12px; border: 1px solid #e0e6ed; border-left: 5px solid var(--ai-accent); margin-bottom: 15px; font-family: 'Segoe UI', sans-serif;">
+                <span style="font-size: 1.2rem; margin-right: 5px;">🎓</span> <strong>AI Professor:</strong>
+                <p style="margin: 8px 0; line-height: 1.5; color: #2c3e50;">${aiIntroText}</p>
+                ${suggestionHtml}
+            </div>
+            <div class="encyclopedia-entry" style="padding: 15px; border-radius: 12px; background: #fff; box-shadow: 0 2px 8px rgba(0,0,0,0.05); border: 1px solid #eee;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                   <strong style="font-size: 1.1rem;">${bestMatch.icone || '📖'} ${bestMatch.titulo}</strong>
+                   <small style="background: #f0f0f0; padding: 2px 8px; border-radius: 10px; color: #666;">Pág. ${bestMatch.pagina || '---'}</small>
+                </div>
+                <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 10px;">
+                <div style="font-size: 0.95rem; color: #444;">${bestMatch.html_content}</div>
             </div>
         `;
     } else {
         aiContent.innerHTML = `
-            <div class="ai-chat-bubble" style="background: #fff5f5; padding: 12px; border-radius: 10px; border-left: 4px solid #ff4d4d;">
-                🤖 <strong>AI Tutor:</strong> "Ainda não tenho informações detalhadas sobre '${query}' no meu cérebro. Tente pesquisar sobre 'forma', 'espaço' ou 'proporção'."
+            <div class="ai-chat-bubble" style="background: #fff5f5; padding: 15px; border-radius: 12px; border-left: 5px solid #ff4d4d; color: #842029;">
+                <strong>AI Professor:</strong> "Não encontrei uma correlação direta para '${query}' em minha biblioteca atual. Que tal explorarmos os conceitos de <i>Forma</i> ou <i>Organização Espacial</i>?"
             </div>`;
     }
 };
