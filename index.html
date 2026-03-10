@@ -80,9 +80,8 @@
 
     const ptVocabularyA = ["abaixo", "acima", "aberto", "abrir", "abacate", "abacaxi", "abafar", "abaixar", "abalar", "abanar", "abandonar", "abençoar", "abertura", "abismo", "abóbora", "abotoar", "abraçar", "abraço", "abranger", "abrigar", "abrigo", "abril", "absoluto", "absurdo", "abundância", "acabar", "academia", "acalmar", "acampamento", "ação", "acaso", "aceitar", "acenar", "acento", "acerto", "aceso", "achar", "acidente", "ácido", "acionar", "aclarar", "acolher", "acomodar", "acompanhar", "aconselhar", "acontecer", "acordar", "acordo", "acreditar", "açúcar"];
 
-    const punctuationMap = { "vírgula": ",", "ponto final": ".", "ponto": ".", "dois pontos": ":", "aspas": '"', "interrogação": "?", "exclamação": "!" };
+    const punctuationMap = { "vírgula": ",", "nova linha": "<br><br>", "ponto final": ".", "ponto": ".", "dois pontos": ":", "aspas": '"', "interrogação": "?", "exclamação": "!" };
 
-    // --- INITIALIZE RECOGNITION FIRST ---
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
     const recognition = new SpeechRecognition();
     recognition.lang = 'pt-BR';
@@ -104,19 +103,11 @@
         return word;
     }
 
-    // --- CONSOLIDATED ONRESULT LOGIC ---
     recognition.onresult = (event) => {
         const lastIndex = event.results.length - 1;
         let originalText = event.results[lastIndex][0].transcript.toLowerCase().trim();
         
-       // 1. Prioridade Total: Comandos de Formatação de Bloco
-        if (originalText === "novo parágrafo" || originalText === "nova linha") {
-            transcriptBox.innerHTML += "<br><br>";
-            transcriptBox.scrollTop = transcriptBox.scrollHeight;
-            return; 
-        }
-
-        // 2. Search Intent Logic
+        // 1. Comandos de Sistema
         if (originalText.startsWith("pesquisar")) {
             const termo = originalText.replace("pesquisar", "").trim();
             if(window.triggerSearch) window.triggerSearch(termo);
@@ -126,7 +117,7 @@
         let processedText = "";
         const trigger = "comando soletrar";
         
-        // 3. Spelling Logic vs Normal Dictation
+        // 2. Processamento de Texto e Pontuação (Incluindo Nova Linha via Mapa)
         if (originalText.includes(trigger)) {
             const parts = originalText.split(trigger);
             let normalPart = parts[0].trim();
@@ -145,14 +136,26 @@
         processInput(processedText, transcriptBox, true);
     };
 
+    // --- FIX IS HERE: processInput handles HTML tags safely ---
     function processInput(text, targetBox, append) {
         if (!text) return;
-        const words = text.split(/\s+/);
+        
+        // Separamos o texto mas mantemos as tags <br><br> intactas
+        const words = text.split(/(\s+|<br><br>)/g);
         let resultHTML = "";
+
         words.forEach(word => {
-            const cleanWord = word.replace(/[.,!?;:"]/g, "");
-            resultHTML += ptVocabularyA.includes(cleanWord) ? `<span class="found">${word}</span> ` : `<span class="not-found">${word}</span> `;
+            if (word === "<br><br>") {
+                resultHTML += word;
+            } else if (word.trim() === "") {
+                resultHTML += word; // Mantém espaços
+            } else {
+                const cleanWord = word.replace(/[.,!?;:"]/g, "").toLowerCase();
+                const isFound = ptVocabularyA.includes(cleanWord);
+                resultHTML += `<span class="${isFound ? 'found' : 'not-found'}">${word}</span>`;
+            }
         });
+
         if (append) { 
             targetBox.innerHTML += resultHTML + " "; 
             targetBox.scrollTop = targetBox.scrollHeight; 
