@@ -82,12 +82,16 @@
 
     const punctuationMap = { "vírgula": ",", "ponto final": ".", "ponto": ".", "dois pontos": ":", "aspas": '"', "interrogação": "?", "exclamação": "!" };
 
+    // --- INITIALIZE RECOGNITION FIRST ---
+    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'pt-BR';
+    recognition.continuous = true;
 
-function handleSpelling(text) {
+    function handleSpelling(text) {
         const tokens = text.trim().split(/\s+/);
         let word = "";
         let makeUpper = false;
-
         tokens.forEach(token => {
             if (token === "maiúsculo" || token === "maiúscula") {
                 makeUpper = true;
@@ -100,44 +104,46 @@ function handleSpelling(text) {
         return word;
     }
 
+    // --- CONSOLIDATED ONRESULT LOGIC ---
     recognition.onresult = (event) => {
         const lastIndex = event.results.length - 1;
         let originalText = event.results[lastIndex][0].transcript.toLowerCase().trim();
         
+        // 1. Line Break Logic
         if (originalText === "novo parágrafo" || originalText === "nova linha") {
             transcriptBox.innerHTML += "<br><br>";
             return;
         }
 
-        // --- FIX IS HERE: Mid-sentence "comando soletrar" detection ---
+        // 2. Search Intent Logic
+        if (originalText.startsWith("pesquisar")) {
+            const termo = originalText.replace("pesquisar", "").trim();
+            if(window.triggerSearch) window.triggerSearch(termo);
+            return;
+        }
+
         let processedText = "";
         const trigger = "comando soletrar";
         
+        // 3. Spelling Logic vs Normal Dictation
         if (originalText.includes(trigger)) {
             const parts = originalText.split(trigger);
-            // Parte 1: Texto normal antes do comando
             let normalPart = parts[0].trim();
             for (const [key, value] of Object.entries(punctuationMap)) {
                 normalPart = normalPart.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
             }
-            
-            // Parte 2: Texto soletrado após o comando
             let spelledPart = handleSpelling(parts[1]);
-            
             processedText = (normalPart ? normalPart + " " : "") + spelledPart;
         } else {
-            // Ditado normal caso não haja o comando
             processedText = originalText;
             for (const [key, value] of Object.entries(punctuationMap)) {
                 processedText = processedText.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
             }
         }
-        // --- END OF FIX ---
         
         processInput(processedText, transcriptBox, true);
     };
 
-    
     function processInput(text, targetBox, append) {
         if (!text) return;
         const words = text.split(/\s+/);
@@ -146,34 +152,16 @@ function handleSpelling(text) {
             const cleanWord = word.replace(/[.,!?;:"]/g, "");
             resultHTML += ptVocabularyA.includes(cleanWord) ? `<span class="found">${word}</span> ` : `<span class="not-found">${word}</span> `;
         });
-        if (append) { targetBox.innerHTML += resultHTML + " "; targetBox.scrollTop = targetBox.scrollHeight; }
-        else { targetBox.innerHTML = resultHTML; }
+        if (append) { 
+            targetBox.innerHTML += resultHTML + " "; 
+            targetBox.scrollTop = targetBox.scrollHeight; 
+        } else { 
+            targetBox.innerHTML = resultHTML; 
+        }
     }
-
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-    const recognition = new SpeechRecognition();
-    recognition.lang = 'pt-BR';
-    recognition.continuous = true;
 
     recognition.onstart = () => { statusText.innerText = "🎤 Ouvindo..."; startBtn.disabled = true; stopBtn.disabled = false; };
     recognition.onend = () => { statusText.innerText = "Ditado pausado."; startBtn.disabled = false; stopBtn.disabled = true; };
-
-    recognition.onresult = (event) => {
-        const lastIndex = event.results.length - 1;
-        let originalText = event.results[lastIndex][0].transcript.toLowerCase().trim();
-        
-        if (originalText.startsWith("pesquisar")) {
-            const termo = originalText.replace("pesquisar", "").trim();
-            if(window.buscarNaEnciclopedia) window.buscarNaEnciclopedia(termo);
-            return;
-        }
-
-        let processedText = originalText;
-        for (const [key, value] of Object.entries(punctuationMap)) {
-            processedText = processedText.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
-        }
-        processInput(processedText, transcriptBox, true);
-    };
 
     startBtn.onclick = () => recognition.start();
     stopBtn.onclick = () => recognition.stop();
