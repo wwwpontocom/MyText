@@ -109,10 +109,11 @@
         const lastIndex = event.results.length - 1;
         let originalText = event.results[lastIndex][0].transcript.toLowerCase().trim();
         
-        // 1. Line Break Logic
+       // 1. Prioridade Total: Comandos de Formatação de Bloco
         if (originalText === "novo parágrafo" || originalText === "nova linha") {
             transcriptBox.innerHTML += "<br><br>";
-            return;
+            transcriptBox.scrollTop = transcriptBox.scrollHeight;
+            return; 
         }
 
         // 2. Search Intent Logic
