@@ -82,6 +82,62 @@
 
     const punctuationMap = { "vírgula": ",", "ponto final": ".", "ponto": ".", "dois pontos": ":", "aspas": '"', "interrogação": "?", "exclamação": "!" };
 
+
+function handleSpelling(text) {
+        const tokens = text.trim().split(/\s+/);
+        let word = "";
+        let makeUpper = false;
+
+        tokens.forEach(token => {
+            if (token === "maiúsculo" || token === "maiúscula") {
+                makeUpper = true;
+            } else {
+                let char = token.charAt(0);
+                word += makeUpper ? char.toUpperCase() : char.toLowerCase();
+                makeUpper = false;
+            }
+        });
+        return word;
+    }
+
+    recognition.onresult = (event) => {
+        const lastIndex = event.results.length - 1;
+        let originalText = event.results[lastIndex][0].transcript.toLowerCase().trim();
+        
+        if (originalText === "novo parágrafo" || originalText === "nova linha") {
+            transcriptBox.innerHTML += "<br><br>";
+            return;
+        }
+
+        // --- FIX IS HERE: Mid-sentence "comando soletrar" detection ---
+        let processedText = "";
+        const trigger = "comando soletrar";
+        
+        if (originalText.includes(trigger)) {
+            const parts = originalText.split(trigger);
+            // Parte 1: Texto normal antes do comando
+            let normalPart = parts[0].trim();
+            for (const [key, value] of Object.entries(punctuationMap)) {
+                normalPart = normalPart.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
+            }
+            
+            // Parte 2: Texto soletrado após o comando
+            let spelledPart = handleSpelling(parts[1]);
+            
+            processedText = (normalPart ? normalPart + " " : "") + spelledPart;
+        } else {
+            // Ditado normal caso não haja o comando
+            processedText = originalText;
+            for (const [key, value] of Object.entries(punctuationMap)) {
+                processedText = processedText.replace(new RegExp(`\\b${key}\\b`, 'g'), value);
+            }
+        }
+        // --- END OF FIX ---
+        
+        processInput(processedText, transcriptBox, true);
+    };
+
+    
     function processInput(text, targetBox, append) {
         if (!text) return;
         const words = text.split(/\s+/);
