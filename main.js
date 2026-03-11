@@ -243,17 +243,15 @@ function exportToWord() {
     // Captura o conteúdo do editor
     const content = document.getElementById('typing-input').innerHTML;
     
-    // Configuração do cabeçalho para simular um documento Word XML
+    // Cabeçalho ultra-compatível (MSOffice + HTML Standard)
     const header = `
         <html xmlns:o='urn:schemas-microsoft-com:office:office' 
               xmlns:w='urn:schemas-microsoft-com:office:word' 
               xmlns='http://www.w3.org/TR/REC-html40'>
         <head>
             <meta charset='utf-8'>
-            <title>Export Document</title>
             <style>
                 body { font-family: 'Segoe UI', Arial, sans-serif; }
-                p { margin: 0; padding: 0; }
             </style>
         </head>
         <body>`;
@@ -261,7 +259,7 @@ function exportToWord() {
     const footer = "</body></html>";
     const sourceHTML = header + content + footer;
 
-    // Criação do Blob com o MIME type correto para Word
+    // MIME Type específico para garantir que o Google Docs identifique como documento
     const blob = new Blob(['\ufeff', sourceHTML], {
         type: 'application/msword' 
     });
@@ -270,8 +268,8 @@ function exportToWord() {
     const fileDownload = document.createElement("a");
     fileDownload.href = url;
     
-    // Alterado para .doc (que o Word abre como compatível) 
-    // ou .docx se você quiser forçar o sistema a reconhecer o XML
+    // Usamos .doc porque o Google Docs converte HTML-Word automaticamente para .docx interno
+    // Se usar .docx direto sem compressão ZIP (binário), o Google Docs pode rejeitar.
     fileDownload.download = 'documento_arquitetura.doc'; 
     
     document.body.appendChild(fileDownload);
