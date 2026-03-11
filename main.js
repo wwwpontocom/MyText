@@ -240,15 +240,44 @@ if (aiSearch) {
 
 // 4. Export & Template Logic (Kept Intact)
 function exportToWord() {
+    // Captura o conteúdo do editor
     const content = document.getElementById('typing-input').innerHTML;
-    const header = `<html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><style>body { font-family: 'Segoe UI', Arial, sans-serif; }</style></head><body>`;
-    const sourceHTML = header + content + "</body></html>";
-    const blob = new Blob(['\ufeff', sourceHTML], { type: 'application/msword' });
+    
+    // Configuração do cabeçalho para simular um documento Word XML
+    const header = `
+        <html xmlns:o='urn:schemas-microsoft-com:office:office' 
+              xmlns:w='urn:schemas-microsoft-com:office:word' 
+              xmlns='http://www.w3.org/TR/REC-html40'>
+        <head>
+            <meta charset='utf-8'>
+            <title>Export Document</title>
+            <style>
+                body { font-family: 'Segoe UI', Arial, sans-serif; }
+                p { margin: 0; padding: 0; }
+            </style>
+        </head>
+        <body>`;
+        
+    const footer = "</body></html>";
+    const sourceHTML = header + content + footer;
+
+    // Criação do Blob com o MIME type correto para Word
+    const blob = new Blob(['\ufeff', sourceHTML], {
+        type: 'application/msword' 
+    });
+
     const url = URL.createObjectURL(blob);
     const fileDownload = document.createElement("a");
-    fileDownload.href = url; fileDownload.download = 'documento.doc';
-    document.body.appendChild(fileDownload); fileDownload.click();
-    document.body.removeChild(fileDownload); URL.revokeObjectURL(url);
+    fileDownload.href = url;
+    
+    // Alterado para .doc (que o Word abre como compatível) 
+    // ou .docx se você quiser forçar o sistema a reconhecer o XML
+    fileDownload.download = 'documento_arquitetura.doc'; 
+    
+    document.body.appendChild(fileDownload);
+    fileDownload.click();
+    document.body.removeChild(fileDownload);
+    URL.revokeObjectURL(url);
 }
 
 function exportToPDF() {
