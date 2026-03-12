@@ -1,8 +1,3 @@
-// --- FIX IS HERE: ADDED PAGE 2 AND NAVIGATION LOGIC ---
-
-// --- FIX IS HERE: COMPLETED INTRODUCTORY CONTAINER ---
-
-// 1. Initial Library Definition: The Conceptual "Capa" of our Dialogues
 let BIBLIOTECA_CONVERSAS = {
     "memoria_academica_geral": {
         keywords: ["memória", "diálogos", "estudos", "conclusões", "professor", "harvard", "aprendizado"],
