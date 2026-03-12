@@ -1,57 +1,60 @@
-// BIBLIOTECA_CONVERSAS: Memória de Diálogos e Aulas Interativas
-let BIBLIOTECA_CONVERSAS = {
-    "logica_eletricidade_basica": {
-        keywords: ["eletricidade", "circuito", "luz", "interruptor", "ligação", "fase", "neutro", "instalações"],
-        fase: "INSTALAÇÕES ELÉTRICAS",
-        titulo: "Aula Interativa: Lógica de Circuitos",
-        icone: "⚡",
-        resumo: "Simulação de circuitos e discussão sobre a infraestrutura elétrica na arquitetura moderna.",
-        html_content: `
-            <div style="line-height: 1.5; color: #333; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #fcfcfc;">
-                <h4 style="color: #d35400;">💡 Laboratório de Eletricidade</h4>
-                <p>Em nossas conversas, discutimos como a fiação deve ser integrada ao projeto sem comprometer a estética. Vamos testar a lógica do interruptor:</p>
-                
-                <div id="simulador-eletrico" style="text-align: center; padding: 20px; background: #eee; border-radius: 10px;">
-                    <div id="lampada" style="font-size: 50px; filter: grayscale(100%); margin-bottom: 10px;">💡</div>
-                    <button class="btn-tool" onclick="document.getElementById('lampada').style.filter = document.getElementById('lampada').style.filter === 'grayscale(0%)' ? 'grayscale(100%)' : 'grayscale(0%)'; this.innerText = this.innerText === 'LIGAR' ? 'DESLIGAR' : 'LIGAR';">
-                        LIGAR
-                    </button>
-                    <p style="font-size: 11px; margin-top: 10px;">(Simulação de Circuito Simples)</p>
-                </div>
+// --- FIX IS HERE: SIMPLIFIED INITIALIZATION AND OBJECT INJECTION ---
 
-                <h4 style="color: #2980b9; margin-top: 15px;">Conceitos Chave do Professor:</h4>
-                <ul>
-                    <li><b>Fase:</b> O condutor que traz o potencial elétrico.</li>
-                    <li><b>Neutro:</b> Fecha o circuito sem tensão.</li>
-                    <li><b>Retorno:</b> O fio que sai do interruptor para a lâmpada.</li>
-                </ul>
-            </div>
-        `,
-        pagina: "Conversa 01"
+// 1. Initial Library Definition: Introductory Container
+let BIBLIOTECA_CONVERSAS = {
+    "intro_memoria": {
+        resumo: "Here is the thoughts, estudos and conclusions of our academic journey."
     }
 };
 
-// Extensão de Memória: Discussões sobre Urbanismo e Planejamento
+// 2. Expansion Block: Subject Cover (Capa) and Lesson 01
 Object.assign(BIBLIOTECA_CONVERSAS, {
-    "teoria_cidade_jardim": {
-        keywords: ["ebenezer howard", "cidade jardim", "urbanismo", "densidade", "cinturão verde", "utopia"],
-        fase: "HISTÓRIA DO URBANISMO",
-        titulo: "Discussão: A Utopia de Howard",
-        icone: "🌳",
-        resumo: "Análise crítica sobre a descentralização urbana e o modelo de Cidade Jardim.",
+    "capa_instalacoes_eletricas": {
+        keywords: ["materia", "instalacoes", "infraestrutura", "eletrica"],
+        fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+        titulo: "Materia Principal: Infraestrutura Elétrica",
+        icone: "📂",
+        resumo: "Visão geral sobre a integração de sistemas de potência e dados no ambiente urbano e predial.",
         html_content: `
-            <div style="line-height: 1.5;">
-                <h4 style="color: #27ae60;">A Cidade Social</h4>
-                <p>Lembramos de nossa aula sobre Howard. O segredo não era apenas o verde, mas a <b>gestão da terra</b>.</p>
-                <div style="background: #eef9f0; padding: 15px; border-left: 5px solid #27ae60;">
-                    <i>"Humanity and Nature can be united in a town-country alliance."</i>
-                </div>
-                <p style="margin-top:10px;">O diagrama dos <b>Três Ímãs</b> explica por que as pessoas migram para a cidade ou para o campo.</p>
-                <button class="btn-tool" onclick="alert('Ímã 1: Cidade (Oportunidades, mas poluição)\\nÍmã 2: Campo (Ar puro, mas tédio)\\nÍmã 3: Cidade-Campo (O melhor dos dois mundos)')">
-                    Ver os 3 Ímãs
-                </button>
+            <div style="text-align: center; padding: 20px; border: 2px solid var(--primary);">
+                <h2 style="color: var(--primary);">Instalações e Infraestrutura Urbana</h2>
+                <p>Módulo de Estudos Técnicos e Práticos</p>
+                <hr>
+                <p style="font-size: 14px;">Este diretório armazena nossas discussões sobre a norma NBR 5410 e a eficiência energética no projeto.</p>
             </div>
         `,
-        pagina: "Conversa 02"
+        pagina: "Capa"
+    },
+    "instalacoes_eletricas_prediais_01": {
+        keywords: ["eletricidade", "circuito", "fase", "neutro", "retorno", "NBR 5410"],
+        fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+        titulo: "Aula 1: Instalações Elétricas Prediais",
+        icone: "⚡",
+        resumo: "Fundamentos de circuitos residenciais e a lógica dos condutores.",
+        html_content: `
+            <div style="line-height: 1.5; color: #333; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #fcfcfc;">
+                <h4 style="color: #d35400;">💡 Laboratório de Eletricidade: Aula 01</h4>
+                <div id="simulador-eletrico" style="text-align: center; padding: 20px; background: #eee; border-radius: 10px;">
+                    <div id="lampada" style="font-size: 50px; filter: grayscale(100%); margin-bottom: 10px; transition: 0.3s;">💡</div>
+                    <button class="btn-tool" style="padding: 10px 20px; cursor: pointer; border-radius: 5px; border: none; background: #d35400; color: white;" 
+                        onclick="const bulb = document.getElementById('lampada'); 
+                                 const isOn = bulb.style.filter === 'grayscale(0%)';
+                                 bulb.style.filter = isOn ? 'grayscale(100%)' : 'grayscale(0%)'; 
+                                 bulb.style.textShadow = isOn ? 'none' : '0 0 20px #f1c40f';
+                                 this.innerText = isOn ? 'LIGAR (FECHAR CIRCUITO)' : 'DESLIGAR (ABRIR CIRCUITO)';">
+                        LIGAR (FECHAR CIRCUITO)
+                    </button>
+                </div>
+                <h4 style="color: #2980b9; margin-top: 15px;">Conceitos:</h4>
+                <ul style="font-size: 13px;">
+                    <li><b>Fase:</b> Tensão ativa.</li>
+                    <li><b>Neutro:</b> Retorno de corrente.</li>
+                    <li><b>Retorno:</b> Fase controlada pelo interruptor.</li>
+                </ul>
+            </div>
+        `,
+        pagina: "Aula 01"
     }
 });
+
+// --- END OF RESTRUCTURED BRAIN ---
