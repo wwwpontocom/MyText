@@ -152,4 +152,78 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
     }
 });
 
+// --- FIX IS HERE: ADDED PAGE 3 - QUADRO DE DISTRIBUIÇÃO (QDC) ---
+
+Object.assign(BIBLIOTECA_CONVERSAS, {
+    "instalacoes_eletricas_prediais_01_p3": {
+        keywords: ["quadro de distribuição", "disjuntor", "circuitos", "DR", "DPS", "barramento"],
+        fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+        titulo: "Aula 1: O Quadro de Distribuição (Pág 3)",
+        icone: "🎛️",
+        resumo: "O cérebro da instalação: organização de circuitos, proteção térmica e seccionamento.",
+        html_content: `
+            <div style="line-height: 1.6; color: #333; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #777; margin-bottom: 10px;">
+                    <span>← Pág 2: Conexões e Soquetes</span>
+                    <span>Pág 4: Dimensionamento →</span>
+                </div>
+
+                <h4 style="color: #c0392b;">🏛️ O Coração da Edificação: O QDC</h4>
+                <p>Como discutimos em nossa análise projetual, o <b>Quadro de Distribuição de Circuitos (QDC)</b> é onde a energia vinda da rua é organizada e protegida antes de ser distribuída para os pontos de luz e tomadas.</p>
+                
+                <h4 style="color: #2980b9;">Componentes de Segurança Críticos:</h4>
+                <ul style="font-size: 13px;">
+                    <li><b>Disjuntor Geral:</b> Protege a entrada de energia de toda a unidade. Se ele cai, nada funciona.</li>
+                    <li><b>Disjuntores Termomagnéticos (DTM):</b> Protegem cada circuito individual (ex: apenas luzes da sala) contra sobrecargas e curtos.</li>
+                    <li><b>IDR (Interruptor Diferencial Residual):</b> O "salva-vidas". Desliga o circuito instantaneamente se detectar uma fuga de corrente (choque elétrico).</li>
+                    <li><b>DPS (Dispositivo de Proteção contra Surtos):</b> Protege seus equipamentos contra raios e picos de tensão da rede.</li>
+                </ul>
+
+                <div id="simulador-qdc" style="background: #2c3e50; padding: 20px; border-radius: 10px; color: white; margin: 15px 0;">
+                    <h5 style="margin-top:0; color: #ecf0f1; text-align: center;">Painel de Controle de Circuitos</h5>
+                    
+                    <div style="display: flex; justify-content: space-around; align-items: flex-end; height: 100px; border: 2px solid #34495e; padding: 10px;">
+                        <div id="dj-geral" style="width: 40px; height: 60px; background: #c0392b; border: 2px solid #fff; position: relative;">
+                             <span style="font-size:8px; position:absolute; top:-15px; left:0;">GERAL</span>
+                        </div>
+                        <div id="dj-luz" style="width: 30px; height: 50px; background: #27ae60; border: 2px solid #fff; position: relative;">
+                             <span style="font-size:8px; position:absolute; top:-15px; left:0;">LUZ</span>
+                        </div>
+                        <div id="dj-tomada" style="width: 30px; height: 50px; background: #27ae60; border: 2px solid #fff; position: relative;">
+                             <span style="font-size:8px; position:absolute; top:-15px; left:0;">TUG</span>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 20px; text-align: center;">
+                        <button class="btn-tool" onclick="simularCurto()" style="background: #e67e22; color: white; border: none; padding: 5px 15px; cursor: pointer;">Simular Curto no Circuito de Luz</button>
+                        <button class="btn-tool" onclick="resetarQuadro()" style="background: #3498db; color: white; border: none; padding: 5px 15px; cursor: pointer; margin-left: 5px;">Resetar Quadro</button>
+                    </div>
+                    <p id="status-qdc" style="font-size: 12px; margin-top: 10px; color: #bdc3c7; font-family: monospace;">Sistema Operacional: Normal</p>
+                </div>
+
+                <p style="font-size: 12px; background: #e8f4fd; padding: 10px; border-left: 5px solid #2980b9;">
+                    <b>Reflexão Arquitetônica:</b> O QDC deve ser localizado em local de fácil acesso e o mais próximo possível do centro de carga da edificação para economizar condutores e reduzir a queda de tensão.
+                </p>
+            </div>
+        `,
+        interatividade: {
+            script: `
+                function simularCurto() {
+                    document.getElementById('dj-luz').style.transform = "rotate(180deg)";
+                    document.getElementById('dj-luz').style.background = "#7f8c8d";
+                    document.getElementById('status-qdc').innerHTML = "⚠️ ALERTA: Curto-circuito detectado! Disjuntor 'LUZ' desarmado.";
+                    document.getElementById('status-qdc').style.color = "#e74c3c";
+                }
+                function resetarQuadro() {
+                    document.getElementById('dj-luz').style.transform = "rotate(0deg)";
+                    document.getElementById('dj-luz').style.background = "#27ae60";
+                    document.getElementById('status-qdc').innerHTML = "Sistema Operacional: Normal";
+                    document.getElementById('status-qdc').style.color = "#bdc3c7";
+                }
+            `
+        },
+        pagina: "Aula 01 - Pág 3"
+    }
+});
+
 // --- END OF RESTRUCTURED BRAIN ---
