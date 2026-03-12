@@ -82,7 +82,7 @@
     let capitalizeNext = false;
 
     const punctuationMap = { 
-        "vírgula": ",", "comma": ",", "ponto final": ".", "period": ".",
+        "vírgula": ",", "comma": ",", "ponto final": ".", "nova linha": "<br><br>", "period": ".",
         "dois pontos": ":", "colon": ":", "ponto e vírgula": ";",
         "interrogação": "?", "question mark": "?", "exclamação": "!",
         "abre parênteses": "(", "fecha parênteses": ")", "aspas": '"'
@@ -152,22 +152,34 @@
     // Shared highlighting function
     function processInput(text, targetBox, append) {
         if (!text) return;
-        const words = text.split(/\s+/);
-        let resultHTML = "";
+        const words = text.split(/(\s+|<br><br>)/g);
+    let resultHTML = "";
 
-        words.forEach(word => {
+       words.forEach(word => {
+       
+        if (word === "<br><br>") {
+            resultHTML += word;
+        } 
+        // Se for apenas espaço, mantemos o espaço original
+        else if (word.trim() === "") {
+            resultHTML += word;
+        } 
+        // Processamento normal de palavras
+        else {
             const cleanWord = word.replace(/[.,!?;:()"]/g, "").toLowerCase();
             const isFound = ptVocabularyA.includes(cleanWord);
-            resultHTML += `<span class="${isFound ? 'found' : 'not-found'}">${word}</span> `;
-        });
-
-        if (append) {
-            targetBox.innerHTML += resultHTML;
-            targetBox.scrollTop = targetBox.scrollHeight;
-        } else {
-            targetBox.innerHTML = resultHTML;
+            resultHTML += `<span class="${isFound ? 'found' : 'not-found'}">${word}</span>`;
         }
+    });
+
+    if (append) {
+        // Adicionamos um espaço ao final apenas se o último item não for uma quebra de linha
+        targetBox.innerHTML += resultHTML + (text.endsWith("<br><br>") ? "" : " ");
+        targetBox.scrollTop = targetBox.scrollHeight;
+    } else {
+        targetBox.innerHTML = resultHTML;
     }
+}
 
     startBtn.onclick = () => recognition.start();
     stopBtn.onclick = () => recognition.stop();
