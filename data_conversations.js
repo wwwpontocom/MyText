@@ -1,4 +1,4 @@
-// --- FIX IS HERE: SIMPLIFIED INITIALIZATION AND OBJECT INJECTION ---
+// --- FIX IS HERE: ADDED PAGE 2 AND NAVIGATION LOGIC ---
 
 // 1. Initial Library Definition: Introductory Container
 let BIBLIOTECA_CONVERSAS = {
@@ -7,7 +7,7 @@ let BIBLIOTECA_CONVERSAS = {
     }
 };
 
-// 2. Expansion Block: Subject Cover (Capa) and Lesson 01
+// 2. Expansion Block: Subject Cover, Lesson 01 (Part 1 & 2)
 Object.assign(BIBLIOTECA_CONVERSAS, {
     "capa_instalacoes_eletricas": {
         keywords: ["materia", "instalacoes", "infraestrutura", "eletrica"],
@@ -21,6 +21,7 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
                 <p>Módulo de Estudos Técnicos e Práticos</p>
                 <hr>
                 <p style="font-size: 14px;">Este diretório armazena nossas discussões sobre a norma NBR 5410 e a eficiência energética no projeto.</p>
+                <div style="margin-top: 10px; font-weight: bold; color: var(--primary);">PRÓXIMO: Aula 01, Pág 1</div>
             </div>
         `,
         pagina: "Capa"
@@ -28,11 +29,15 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
     "instalacoes_eletricas_prediais_01": {
         keywords: ["eletricidade", "circuito", "fase", "neutro", "retorno", "NBR 5410"],
         fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
-        titulo: "Aula 1: Instalações Elétricas Prediais",
+        titulo: "Aula 1: Instalações Elétricas (Pág 1)",
         icone: "⚡",
         resumo: "Fundamentos de circuitos residenciais e a lógica dos condutores.",
         html_content: `
             <div style="line-height: 1.5; color: #333; padding: 10px; border: 1px solid #ddd; border-radius: 8px; background: #fcfcfc;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #777; margin-bottom: 10px;">
+                    <span>← Capa</span>
+                    <span>Pág 2: Luz Artificial →</span>
+                </div>
                 <h4 style="color: #d35400;">💡 Laboratório de Eletricidade: Aula 01</h4>
                 <div id="simulador-eletrico" style="text-align: center; padding: 20px; background: #eee; border-radius: 10px;">
                     <div id="lampada" style="font-size: 50px; filter: grayscale(100%); margin-bottom: 10px; transition: 0.3s;">💡</div>
@@ -49,11 +54,101 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
                 <ul style="font-size: 13px;">
                     <li><b>Fase:</b> Tensão ativa.</li>
                     <li><b>Neutro:</b> Retorno de corrente.</li>
-                    <li><b>Retorno:</b> Fase controlada pelo interruptor.</li>
                 </ul>
             </div>
         `,
-        pagina: "Aula 01"
+        pagina: "Aula 01 - Pág 1"
+    },
+  // --- FIX IS HERE: EXPANDED PAGE 2 WITH FOUR-WIRE LOGIC AND INTERACTIVITY ---
+
+Object.assign(BIBLIOTECA_CONVERSAS, {
+    "instalacoes_eletricas_prediais_01_p2": {
+        keywords: ["luz artificial", "interruptor simples", "fase", "neutro", "terra", "retorno", "NBR 5410"],
+        fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+        titulo: "Aula 1: Componentes e Conexões (Pág 2)",
+        icone: "🔌",
+        resumo: "Detalhamento técnico dos condutores e anatomia da conexão em luminárias.",
+        html_content: `
+            <div style="line-height: 1.6; color: #333; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #777; margin-bottom: 10px;">
+                    <span>← Pág 1: Conceitos Iniciais</span>
+                    <span>Pág 3: Em breve →</span>
+                </div>
+
+                <h4 style="color: #d35400;">1. A Anatomia do Ponto de Luz</h4>
+                <p>O provimento de luz não é apenas estético; exige uma infraestrutura de quatro vias para garantir funcionamento e segurança (NBR 5410):</p>
+                
+                <table style="width:100%; border-collapse: collapse; font-size: 12px; margin-bottom: 15px;">
+                    <tr style="background: #f2f2f2;">
+                        <th style="border: 1px solid #ccc; padding: 5px;">Condutor</th>
+                        <th style="border: 1px solid #ccc; padding: 5px;">Função Técnica</th>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ccc; padding: 5px;"><b>Fase (L)</b></td>
+                        <td style="border: 1px solid #ccc; padding: 5px;">Traz o potencial. Nunca vai direto à lâmpada; deve passar pelo interruptor.</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ccc; padding: 5px; color: #2980b9;"><b>Neutro (N)</b></td>
+                        <td style="border: 1px solid #ccc; padding: 5px;">Referência zero. Conecta-se diretamente à <b>base rosqueada</b> (rosca) da luminária.</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ccc; padding: 5px; color: #27ae60;"><b>Terra (PE)</b></td>
+                        <td style="border: 1px solid #ccc; padding: 5px;">Proteção. Conecta-se à carcaça metálica da luminária para escoar fugas.</td>
+                    </tr>
+                    <tr>
+                        <td style="border: 1px solid #ccc; padding: 5px; color: #f39c12;"><b>Retorno (R)</b></td>
+                        <td style="border: 1px solid #ccc; padding: 5px;">A "fase seccionada". Conecta o interruptor ao <b>disco central</b> (contato fundo) da luminária.</td>
+                    </tr>
+                </table>
+
+                <h4 style="color: #d35400;">2. Laboratório: Montagem do Soquete</h4>
+                <p style="font-size: 13px;">Clique nos componentes para simular a ligação correta:</p>
+                
+                <div id="box-aula-eletrica" style="background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #eee; text-align: center;">
+                    <div style="display: inline-block; text-align: left; background: #fff; padding: 15px; border: 2px solid #333; border-radius: 50%; width: 120px; height: 120px; position: relative;">
+                        <div style="border: 5px solid #bdc3c7; border-radius: 50%; width: 80px; height: 80px; margin: 15px auto; position: relative;">
+                            <div id="contato-central" style="width: 20px; height: 20px; background: #ccc; border-radius: 50%; position: absolute; top: 30px; left: 30px;"></div>
+                        </div>
+                        <p style="position: absolute; bottom: -30px; left: 20px; font-size: 10px; font-weight: bold;">LUMINÁRIA (BASE)</p>
+                    </div>
+
+                    <div style="margin-top: 40px; display: flex; justify-content: center; gap: 10px;">
+                        <button class="btn-tool" onclick="conectarFio('neutro')" style="background: #2980b9; color: white; border: none; padding: 5px 10px; cursor: pointer;">Ligar Neutro na Rosca</button>
+                        <button class="btn-tool" onclick="conectarFio('retorno')" style="background: #f39c12; color: white; border: none; padding: 5px 10px; cursor: pointer;">Ligar Retorno no Centro</button>
+                    </div>
+                    <div id="log-conexao" style="margin-top: 15px; font-size: 12px; font-family: monospace; color: #e67e22;">Aguardando conexões...</div>
+                </div>
+
+                <p style="font-size: 12px; margin-top: 15px; background: #fff3cd; padding: 10px; border-radius: 5px;">
+                    <b>Nota do Professor:</b> Por que o Neutro na rosca? Para evitar que, ao trocar uma lâmpada, o usuário tome um choque ao encostar acidentalmente na parte rosqueada metálica. O potencial vivo (Retorno) fica "escondido" no fundo do bocal.
+                </p>
+            </div>
+        `,
+        interatividade: {
+            script: `
+                let n_connected = false;
+                let r_connected = false;
+                function conectarFio(tipo) {
+                    const log = document.getElementById('log-conexao');
+                    const central = document.getElementById('contato-central');
+                    if(tipo === 'neutro') {
+                        n_connected = true;
+                        log.innerHTML = "✅ Neutro conectado à base rosqueada.";
+                    }
+                    if(tipo === 'retorno') {
+                        r_connected = true;
+                        central.style.background = "#f1c40f";
+                        central.style.boxShadow = "0 0 10px #f1c40f";
+                        log.innerHTML = "✅ Retorno conectado ao disco central.";
+                    }
+                    if(n_connected && r_connected) {
+                        log.innerHTML = "💡 CIRCUITO SEGURO E PRONTO! Lâmpada pode ser acionada.";
+                        log.style.color = "#27ae60";
+                    }
+                }
+            `
+        },
+        pagina: "Aula 01 - Pág 2"
     }
 });
 
