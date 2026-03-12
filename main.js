@@ -33,6 +33,7 @@ function getLibraryData() {
     if (typeof BIBLIOTECA_DICIONARIO !== 'undefined') Object.assign(brain, BIBLIOTECA_DICIONARIO);
     if (typeof BIBLIOTECA_VOCABULARIO !== 'undefined') Object.assign(brain, BIBLIOTECA_VOCABULARIO);
     if (typeof BIBLIOTECA_FORM !== 'undefined') Object.assign(brain, BIBLIOTECA_FORM);
+    if (typeof BIBLIOTECA_CONVERSAS !== 'undefined') Object.assign(brain, BIBLIOTECA_CONVERSAS);
     return brain;
 }
 
