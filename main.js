@@ -139,11 +139,25 @@ window.askSmartAI = function(query) {
     if (intentResponse) {
         aiContent.innerHTML += `<div style="background: #f0f4f8; padding: 12px; border-radius: 10px; border-left: 4px solid #007bff; margin-bottom: 15px;">🤖 ${intentResponse}</div>`;
     } else {
-        // Simple keyword match
-        let match = Object.values(brain).find(e => e.titulo.toLowerCase().includes(text));
+        // Find match checking both Titles AND Keywords
+        let match = Object.values(brain).find(e => {
+            const titleMatch = e.titulo.toLowerCase().includes(text);
+            const keywordMatch = e.keywords && e.keywords.some(k => k.toLowerCase() === text || k.toLowerCase().includes(text));
+            return titleMatch || keywordMatch;
+        });
+
         if (match) {
             lastResult = match;
-            aiContent.innerHTML += `<div style="background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-bottom: 15px;"><strong>${match.titulo}</strong><hr>${match.html_content || match.definicao}</div>`;
+            // Inject potential interactivity script if it exists
+            const scriptTag = match.interatividade ? `<script>${match.interatividade.script}<\/script>` : "";
+            
+            aiContent.innerHTML += `
+                <div style="background: #fff; border: 1px solid #eee; padding: 15px; border-radius: 10px; margin-bottom: 15px;">
+                    <strong>${match.titulo}</strong>
+                    <hr>
+                    ${match.html_content || match.definicao}
+                    ${scriptTag}
+                </div>`;
         } else {
             aiContent.innerHTML += `<div style="color: #666; font-style: italic; margin-bottom: 15px;">🤖 Não localizei este termo.</div>`;
         }
