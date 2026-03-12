@@ -1,12 +1,49 @@
 // --- FIX IS HERE: ADDED PAGE 2 AND NAVIGATION LOGIC ---
 
-// 1. Initial Library Definition: Introductory Container
+// --- FIX IS HERE: COMPLETED INTRODUCTORY CONTAINER ---
+
+// 1. Initial Library Definition: The Conceptual "Capa" of our Dialogues
 let BIBLIOTECA_CONVERSAS = {
-    "intro_memoria": {
-        resumo: "Here is the thoughts, estudos and conclusions of our academic journey."
+    "memoria_academica_geral": {
+        keywords: ["memória", "diálogos", "estudos", "conclusões", "professor", "harvard", "aprendizado"],
+        fase: "CONVERSATIONS & BRAIN",
+        titulo: "Repositório de Diálogos Acadêmicos",
+        icone: "🧠",
+        resumo: "Here are the thoughts, conversations, explanations and conclusions about several issues, subjects, like grammar, architecture, languages, and so forth.",
+        html_content: `
+            <div style="line-height: 1.6; color: #2c3e50; padding: 20px; border: 2px solid #34495e; border-radius: 12px; background: #fff;">
+                <h3 style="color: #2c3e50; text-align: center; border-bottom: 2px solid #34495e; padding-bottom: 10px;">
+                    Digital Brain: Academic Dialogues
+                </h3>
+                <p>Este espaço funciona como uma <b>extensão cognitiva</b> de nossas sessões de mentoria. Aqui, transformamos conversas informais e dúvidas de aula em módulos de conhecimento estruturados.</p>
+                
+                <div style="background: #f8f9fa; padding: 15px; border-left: 5px solid #34495e; margin: 15px 0;">
+                    <p style="margin: 0; font-style: italic;">
+                        "Architecture is not just building; it is the conversation between the environment, the technique, and the human inhabitant."
+                    </p>
+                </div>
+
+                <h4 style="color: #34495e;">O que você encontrará aqui:</h4>
+                <ul>
+                    <li><b>Insights de Arquitetura:</b> Da teoria de Harvard às práticas de canteiro.</li>
+                    <li><b>Refinamento Linguístico:</b> Evoluções rumo ao nível C2 de Inglês.</li>
+                    <li><b>Infraestrutura Urbana:</b> Detalhamentos técnicos e tecnológicos.</li>
+                    <li><b>Conclusões Conjuntas:</b> Onde o pensamento crítico encontra a aplicação prática.</li>
+                </ul>
+                
+                <p style="font-size: 13px; color: #7f8c8d; text-align: center; margin-top: 20px;">
+                    <i>Utilize os botões de navegação para alternar entre as aulas e reflexões salvas.</i>
+                </p>
+            </div>
+        `,
+        pagina: "Início"
     }
 };
 
+// 2. Expansion Block (Subjects like 'capa_instalacoes_eletricas', 'p1', 'p2', 'p3' follow here...)
+// Object.assign(BIBLIOTECA_CONVERSAS, { ... });
+
+// --- END OF INITIALIZATION ---
 // 2. Expansion Block: Subject Cover, Lesson 01 (Part 1 & 2)
 Object.assign(BIBLIOTECA_CONVERSAS, {
     "capa_instalacoes_eletricas": {
