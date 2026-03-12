@@ -91,10 +91,7 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
         `,
         pagina: "Aula 01 - Pág 1"
     },
-  // --- FIX IS HERE: EXPANDED PAGE 2 WITH FOUR-WIRE LOGIC AND INTERACTIVITY ---
-// --- FIX IS HERE: CONSOLIDATED PAGES 2 & 3 WITH SYNTAX CORRECTIONS ---
 
-Object.assign(BIBLIOTECA_CONVERSAS, {
     "instalacoes_eletricas_prediais_01_p2": {
         keywords: ["luz artificial", "interruptor simples", "fase", "neutro", "terra", "retorno", "NBR 5410"],
         fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
