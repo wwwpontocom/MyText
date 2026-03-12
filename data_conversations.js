@@ -1,6 +1,6 @@
 let BIBLIOTECA_CONVERSAS = {
     "memoria_academica_geral": {
-        keywords: ["memória", "diálogos", "estudos", "conclusões", "professor", "harvard", "aprendizado"],
+        keywords: ["geral","memoria", "dialogos", "estudos", "conclusões", "professor", "harvard", "aprendizado"],
         fase: "CONVERSATIONS & BRAIN",
         titulo: "Repositório de Diálogos Acadêmicos",
         icone: "🧠",
