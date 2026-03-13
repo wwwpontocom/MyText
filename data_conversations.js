@@ -254,10 +254,10 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
     pagina: "Aula 01 - Pág 4"
 }
     
-    "instalacoes_eletricas_prediais_01_p4": {
+    "instalacoes_eletricas_prediais_01_p5": {
         keywords: ["quadro de distribuição", "disjuntor", "circuitos", "DR", "DPS", "barramento"],
         fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
-        titulo: "Aula 1: O Quadro de Distribuição (Pág 4)",
+        titulo: "Aula 1: O Quadro de Distribuição (Pág 5)",
         icone: "🎛️",
         resumo: "O cérebro da instalação: organização de circuitos, proteção térmica e seccionamento.",
         html_content: `
