@@ -1,8 +1,8 @@
 // simulators.js - Logic for Architectural & Electrical Simulators
-// --- FIX IS HERE: Fully Consolidated Logic (All Lessons + Page 5) ---
+// --- FIX IS HERE: Consolidated Logic with Enhanced Safety and Aula 2 Expansion ---
 
 window.SimulatorLogic = {
-    // --- LESSON 01 - PAGE 2: SOCKET ASSEMBLY ---
+    // Lesson 01 - Page 2: Socket Assembly State
     n_connected: false,
     r_connected: false,
     sw_on: false,
@@ -14,6 +14,8 @@ window.SimulatorLogic = {
         const central = document.getElementById('contato-central');
 
         if(!log) return;
+
+        // Safety Check: Avoid "shocks" if switch is already closed
         if(this.sw_on) {
             log.innerHTML = "⚠️ PERIGO: Desligue o interruptor antes de manusear os fios!";
             log.style.color = "#c0392b";
@@ -48,18 +50,21 @@ window.SimulatorLogic = {
             btn.innerHTML = this.sw_on ? "Interruptor: LIGADO" : "Interruptor: DESLIGADO";
             btn.style.background = this.sw_on ? "#27ae60" : "#95a5a6";
         }
+
         if(this.sw_on && (!this.n_connected || !this.r_connected)) {
             if(log) {
                 log.innerHTML = "⚠️ Circuito aberto: conecte os fios primeiro.";
                 log.style.color = "#e67e22";
             }
         }
+        
         this.atualizarLampada();
     },
 
     atualizarLampada() {
         const lamp = document.getElementById('lampada-visual');
         const log = document.getElementById('log-conexao');
+        
         if(this.n_connected && this.r_connected && this.sw_on) {
             if(lamp) {
                 lamp.style.color = "#f1c40f";
@@ -79,184 +84,142 @@ window.SimulatorLogic = {
         }
     },
 
-    // --- PAGE 5: WIRING CHALLENGE STATE ---
-    pg5_switchOn: false,
-    pg5_breakerOn: false,
-    selectedWireType: null,
-    connections: { 
-        posteToQuadro: { fase: false, neutro: false, protecao: false },
-        quadroToHouse: { fase: false, neutro: false, retorno: false, protecao: false }
-    },
-
-    selectWire(type, btn) {
-        this.selectedWireType = type;
-        document.querySelectorAll('.wire-btn').forEach(b => b.classList.remove('selected'));
-        if (btn) btn.classList.add('selected');
-        const msgBox = document.getElementById('message-box');
-        if (msgBox) msgBox.innerHTML = `Fio <strong>${type.toUpperCase()}</strong> selecionado. Clique no destino para conectar.`;
-    },
-
-    toggleBreaker(e) {
-        if(e) e.stopPropagation();
-        const msgBox = document.getElementById('message-box');
-        if (!this.connections.posteToQuadro.fase) {
-            if(msgBox) msgBox.innerHTML = "❌ <span style='color:red'>ERRO:</span> Não há energia vindo do poste!";
-            return;
+    resetarSoquete() {
+        this.n_connected = false;
+        this.r_connected = false;
+        this.sw_on = false;
+        
+        const btn = document.getElementById('btn-switch');
+        if(btn) { 
+            btn.innerHTML = "Interruptor: DESLIGADO"; 
+            btn.style.background = "#95a5a6"; 
         }
-        this.pg5_breakerOn = !this.pg5_breakerOn;
-        const b = document.getElementById('disjuntor-geral');
-        const s = document.getElementById('status-energia');
-        if (this.pg5_breakerOn) {
-            if(b) b.classList.add('on');
-            if(s) { s.innerText = "DISJUNTOR: ON"; s.style.color = "#2ecc71"; }
-            this.checkVictoryPG5();
-        } else {
-            if(b) b.classList.remove('on');
-            if(s) { s.innerText = "DISJUNTOR: OFF"; s.style.color = "#ff4757"; }
-            const lamp = document.getElementById('lamp-img');
-            if(lamp) lamp.style.filter = "none";
+        
+        const fn = document.getElementById('fio-neutro');
+        const fr = document.getElementById('fio-retorno');
+        const central = document.getElementById('contato-central');
+        const log = document.getElementById('log-conexao');
+        
+        if(fn) fn.style.opacity = "0";
+        if(fr) fr.style.opacity = "0";
+        if(central) { central.style.background = "#ccc"; central.style.boxShadow = "none"; }
+        if(log) { log.innerHTML = "Aguardando conexões..."; log.style.color = "#e67e22"; }
+        
+        this.atualizarLampada();
+    },
+
+    // Lesson 01 - Page 5: Breaker Panel (QDC) Logic
+    simularCurto() {
+        const d = document.getElementById('dj-luz');
+        const status = document.getElementById('status-qdc');
+        if(d && status) {
+            d.style.transform = "rotate(180deg)";
+            d.style.background = "#7f8c8d";
+            status.innerHTML = "⚠️ Curto detectado! Disjuntor desarmado.";
         }
     },
 
-    makeConnection(target) {
-        if (!this.selectedWireType) return;
-        const msgBox = document.getElementById('message-box');
-        let isCorrect = false;
+    resetarQuadro() {
+        const d = document.getElementById('dj-luz');
+        const status = document.getElementById('status-qdc');
+        if(d && status) {
+            d.style.transform = "rotate(0deg)";
+            d.style.background = "#27ae60";
+            status.innerHTML = "Status: Normal";
+        }
+    },
 
-        if (this.selectedWireType === 'fase') {
-            if (target === 'quadro') {
-                this.drawLine(200, 45, 240, 140, 'red');
-                this.connections.posteToQuadro.fase = true;
-                isCorrect = true;
-            } else if (target === 'interruptor') {
-                if (!this.connections.posteToQuadro.fase) { msgBox.innerText = "Ligue o poste primeiro!"; return; }
-                this.drawLine(400, 140, 750, 440, 'red');
-                this.connections.quadroToHouse.fase = true;
-                isCorrect = true;
+    // Aula 02 Logic (Expansion)
+   aula2_switch: false,
+    toggleAula2() {
+        const lamp = document.getElementById('lamp-aula2');
+        const sw = document.getElementById('switch-visual-aula2');
+        const log = document.getElementById('log-aula2');
+        this.aula2_switch = !this.aula2_switch;
+        
+        if(this.aula2_switch) {
+            if(lamp) {
+                lamp.setAttribute('fill', '#f1c40f');
+                lamp.style.filter = "drop-shadow(0 0 10px #f1c40f)";
             }
-        } else if (this.selectedWireType === 'neutro') {
-            if (target === 'quadro') {
-                this.drawLine(200, 85, 240, 95, 'blue');
-                this.connections.posteToQuadro.neutro = true;
-                isCorrect = true;
-            } else if (target === 'lampada') {
-                this.drawLine(400, 95, 630, 95, 'blue');
-                this.connections.quadroToHouse.neutro = true;
-                isCorrect = true;
-            }
-        } else if (this.selectedWireType === 'retorno' && target === 'lampada') {
-            if (!this.connections.quadroToHouse.fase) { msgBox.innerText = "O interruptor precisa de fase!"; return; }
-            this.drawLine(785, 440, 700, 150, 'black');
-            this.connections.quadroToHouse.retorno = true;
-            isCorrect = true;
-        } else if (this.selectedWireType === 'protecao' && target === 'lampada') {
-            this.drawLine(200, 125, 740, 70, 'green');
-            this.connections.quadroToHouse.protecao = true;
-            isCorrect = true;
-        }
-
-        if (!isCorrect) this.triggerShortCircuit();
-        if (this.pg5_breakerOn) this.checkVictoryPG5();
-    },
-
-    drawLine(x1, y1, x2, y2, color) {
-        const canvas = document.getElementById('wire-canvas');
-        if (!canvas) return;
-        const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-        line.setAttribute('x1', x1); line.setAttribute('y1', y1);
-        line.setAttribute('x2', x2); line.setAttribute('y2', y2);
-        line.setAttribute('stroke', color);
-        line.setAttribute('stroke-width', '4');
-        canvas.appendChild(line);
-    },
-
-    triggerShortCircuit() {
-        const msgBox = document.getElementById('message-box');
-        if(msgBox) msgBox.innerHTML = "<strong style='color:red;'>💥 ERRO DE CONEXÃO!</strong> Perigo de Curto!";
-        const area = document.getElementById('render-area');
-        if(area) {
-            area.classList.add('short-circuit');
-            setTimeout(() => area.classList.remove('short-circuit'), 1000);
-        }
-    },
-
-    checkVictoryPG5() {
-        const lamp = document.getElementById('lamp-img');
-        const msgBox = document.getElementById('message-box');
-        const isFullyConnected = this.connections.quadroToHouse.fase && 
-                                 this.connections.quadroToHouse.neutro && 
-                                 this.connections.quadroToHouse.retorno;
-
-        if (this.pg5_breakerOn && this.pg5_switchOn && isFullyConnected) {
-            if(lamp) lamp.style.filter = "drop-shadow(0 0 40px #f1c40f) brightness(1.3)";
-            if(msgBox) msgBox.innerHTML = "<b style='color:green;'>💡 EXCELENTE! Lâmpada Acesa!</b>";
-        }
-    },
-
-    toggleSwitchPG5() {
-        const msgBox = document.getElementById('message-box');
-        if (!this.connections.quadroToHouse.fase || !this.connections.quadroToHouse.retorno) {
-            if(msgBox) msgBox.innerHTML = "⚠️ Interruptor sem fiação completa.";
-            return;
-        }
-        this.pg5_switchOn = !this.pg5_switchOn;
-        const lever = document.getElementById('switch-lever');
-        if(lever) {
-            lever.style.backgroundColor = this.pg5_switchOn ? "#fff" : "#eee";
-            lever.style.transform = this.pg5_switchOn ? "scaleY(0.8)" : "scaleY(1)";
-        }
-        this.checkVictoryPG5();
-    },
-
-    measure(point) {
-        const display = document.getElementById('multi-display');
-        if(!display) return;
-        if (point === 'fase_bruta') {
-            display.innerText = "127";
-        } else if (!this.pg5_breakerOn) {
-            display.innerText = "000";
+            if(sw) sw.style.transform = "rotate(-10deg)";
+            if(log) log.innerHTML = "⚡ Circuito Fechado: Corrente fluindo pelo Retorno.";
         } else {
-            if (point === 'fase_quadro' && this.connections.posteToQuadro.fase) display.innerText = "127";
-            else if (point === 'interruptor' && this.connections.quadroToHouse.fase) display.innerText = "127";
-            else if (point === 'lampada' && this.connections.quadroToHouse.retorno && this.pg5_switchOn) display.innerText = "127";
-            else display.innerText = "000";
+            if(lamp) {
+                lamp.setAttribute('fill', '#bbb');
+                lamp.style.filter = "none";
+            }
+            if(sw) sw.style.transform = "rotate(20deg)";
+            if(log) log.innerHTML = "⚪ Circuito Aberto: Interruptor seccionou a Fase.";
+        }
+    }, // --- FIX IS HERE: Replaced }; with a comma to keep the object open ---
+
+    // NEW: Game Logic for Page 4 (Wiring Challenge)
+    gameState: { fase: false, retorno: false, neutro: false, terra: false },
+    
+    gameConnect(fio, destino) {
+        const feedback = document.getElementById('game-feedback');
+        const term = document.getElementById('term-' + destino);
+        
+        if (this.gameState[fio]) return; 
+
+        let msg = "";
+        let color = "#333";
+
+        if (fio === 'fase' && destino === 'sw') {
+            msg = "<b>Fase ligada!</b> Conforme a NBR 5410, a fase deve ser seccionada pelo interruptor para garantir que o bocal não fique energizado ao desligar.";
+            color = "#c0392b";
+            this.gameState.fase = true;
+        } else if (fio === 'retorno' && destino === 'disco') {
+            msg = "<b>Retorno ligado!</b> O retorno conecta a saída do interruptor ao disco central da lâmpada, completando o caminho da fase.";
+            color = "#f39c12";
+            this.gameState.retorno = true;
+        } else if (fio === 'neutro' && destino === 'base') {
+            msg = "<b>Neutro ligado!</b> Deve ser conectado na base rosqueada para evitar choque elétrico se alguém tocar na rosca durante a troca.";
+            color = "#2980b9";
+            this.gameState.neutro = true;
+        } else if (fio === 'terra' && destino === 'terra') {
+            msg = "<b>Terra ligado!</b> Conectado à carcaça metálica da luminária para desviar correntes de fuga e proteger o usuário.";
+            color = "#27ae60";
+            this.gameState.terra = true;
+        }
+
+        if (term) term.setAttribute('fill', color);
+        if (feedback) {
+            feedback.innerHTML = msg;
+            feedback.style.borderLeftColor = color;
+        }
+        
+        this.checkVictory();
+    },
+
+    checkVictory() {
+        const lamp = document.getElementById('lamp-game');
+        const feedback = document.getElementById('game-feedback');
+        if (this.gameState.fase && this.gameState.retorno && this.gameState.neutro && this.gameState.terra) {
+            if (lamp) {
+                lamp.setAttribute('fill', '#f1c40f');
+                lamp.style.filter = "drop-shadow(0 0 15px #f1c40f)";
+            }
+            if (feedback) {
+                feedback.innerHTML = "<b>✨ SUCESSO!</b> Circuito completo e seguro. A lâmpada acendeu seguindo todas as normas técnicas.";
+                feedback.style.borderLeftColor = "#27ae60";
+            }
+        }
+    },
+
+    gameReset() {
+        this.gameState = { fase: false, retorno: false, neutro: false, terra: false };
+        const lamp = document.getElementById('lamp-game');
+        if (lamp) { lamp.setAttribute('fill', '#eee'); lamp.style.filter = "none"; }
+        ['sw', 'disco', 'base', 'terra'].forEach(id => {
+            const t = document.getElementById('term-' + id);
+            if (t) t.setAttribute('fill', '#ecf0f1');
+        });
+        const feedback = document.getElementById('game-feedback');
+        if (feedback) {
+            feedback.innerHTML = "Escolha um condutor para iniciar a instalação.";
+            feedback.style.borderLeftColor = "#7f8c8d";
         }
     }
 };
-// --- MULTIMETER DRAG LOGIC ---
-    multimeterState: { offset: { x: 0, y: 0 } },
-
-    startDrag(e) {
-        const multi = document.getElementById('multimeter');
-        if (!multi) return;
-
-        // Calculate offset
-        this.multimeterState.offset.x = e.clientX - multi.offsetLeft;
-        this.multimeterState.offset.y = e.clientY - multi.offsetTop;
-
-        // Use arrow functions to maintain "this" context
-        const onMouseMove = (ev) => {
-            multi.style.left = (ev.clientX - this.multimeterState.offset.x) + 'px';
-            multi.style.top = (ev.clientY - this.multimeterState.offset.y) + 'px';
-        };
-
-        const onMouseUp = () => {
-            document.removeEventListener('mousemove', onMouseMove);
-            document.removeEventListener('mouseup', onMouseUp);
-        };
-
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-    }
-}; // --- END OF SIMULATORLOGIC OBJECT ---
-
-// --- GLOBAL BRIDGE (Keeps HTML onclicks/onmousedown working) ---
-window.selectWire = (t, b) => window.SimulatorLogic.selectWire(t, b);
-window.makeConnection = (t) => window.SimulatorLogic.makeConnection(t);
-window.toggleBreaker = (e) => window.SimulatorLogic.toggleBreaker(e);
-window.toggleSwitch = () => window.SimulatorLogic.toggleSwitchPG5();
-window.measure = (p) => window.SimulatorLogic.measure(p);
-window.clearMeasure = () => { const d = document.getElementById('multi-display'); if(d) d.innerText = "000"; };
-
-// Link the multimeter drag event
-window.startDrag = (e) => window.SimulatorLogic.startDrag(e);
