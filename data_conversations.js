@@ -35,10 +35,8 @@ let BIBLIOTECA_CONVERSAS = {
     }
 };
 
-// 2. Expansion Block (Subjects like 'capa_instalacoes_eletricas', 'p1', 'p2', 'p3' follow here...)
-// Object.assign(BIBLIOTECA_CONVERSAS, { ... });
-
 // --- END OF INITIALIZATION ---
+
 // 2. Expansion Block: Subject Cover, Lesson 01 (Part 1 & 2)
 Object.assign(BIBLIOTECA_CONVERSAS, {
     "capa_instalacoes_eletricas": {
@@ -48,12 +46,12 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
         icone: "📂",
         resumo: "Visão geral sobre a integração de sistemas de potência e dados no ambiente urbano e predial.",
         html_content: `
-            <div style="text-align: center; padding: 20px; border: 2px solid var(--primary);">
-                <h2 style="color: var(--primary);">Instalações e Infraestrutura Urbana</h2>
+            <div style="text-align: center; padding: 20px; border: 2px solid #34495e; border-radius: 8px;">
+                <h2 style="color: #2c3e50;">Instalações e Infraestrutura Urbana</h2>
                 <p>Módulo de Estudos Técnicos e Práticos</p>
-                <hr>
+                <hr style="border: 0; border-top: 1px solid #eee;">
                 <p style="font-size: 14px;">Este diretório armazena nossas discussões sobre a norma NBR 5410 e a eficiência energética no projeto.</p>
-                <div style="margin-top: 10px; font-weight: bold; color: var(--primary);">PRÓXIMO: Aula 01, Pág 1</div>
+                <div style="margin-top: 10px; font-weight: bold; color: #d35400;">PRÓXIMO: Aula 01, Pág 1</div>
             </div>
         `,
         pagina: "Capa"
@@ -84,15 +82,16 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
                 </div>
                 <h4 style="color: #2980b9; margin-top: 15px;">Conceitos:</h4>
                 <ul style="font-size: 13px;">
-                    <li><b>Fase:</b> Tensão ativa.</li>
-                    <li><b>Neutro:</b> Retorno de corrente.</li>
+                    <li><b>Fase:</b> Tensão ativa (potencial elétrico).</li>
+                    <li><b>Neutro:</b> Referência de retorno (zero volts).</li>
+                    <li><b>Retorno:</b> A fase após passar pelo interruptor.</li>
                 </ul>
             </div>
         `,
         pagina: "Aula 01 - Pág 1"
     },
 
-    "instalacoes_eletricas_prediais_01_p2": {
+   "instalacoes_eletricas_prediais_01_p2": {
         keywords: ["luz artificial", "interruptor simples", "fase", "neutro", "terra", "retorno", "NBR 5410"],
         fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
         titulo: "Aula 1: Componentes e Conexões (Pág 2)",
@@ -148,32 +147,30 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
                 <p style="font-size: 12px; margin-top: 15px; background: #fff3cd; padding: 10px; border-radius: 5px;">
                     <b>Nota do Professor:</b> O Neutro na rosca evita choques acidentais durante a troca da lâmpada.
                 </p>
+                <script>
+                    window.n_connected = false;
+                    window.r_connected = false;
+                    window.conectarFio = function(tipo) {
+                        const log = document.getElementById('log-conexao');
+                        const central = document.getElementById('contato-central');
+                        if(tipo === 'neutro') {
+                            window.n_connected = true;
+                            log.innerHTML = "✅ Neutro conectado à base rosqueada.";
+                        }
+                        if(tipo === 'retorno') {
+                            window.r_connected = true;
+                            central.style.background = "#f1c40f";
+                            central.style.boxShadow = "0 0 10px #f1c40f";
+                            log.innerHTML = "✅ Retorno conectado ao disco central.";
+                        }
+                        if(window.n_connected && window.r_connected) {
+                            log.innerHTML = "💡 CIRCUITO PRONTO! Lâmpada pode ser acionada.";
+                            log.style.color = "#27ae60";
+                        }
+                    };
+                </script>
             </div>
         `,
-        interatividade: {
-            script: `
-                let n_connected = false;
-                let r_connected = false;
-                function conectarFio(tipo) {
-                    const log = document.getElementById('log-conexao');
-                    const central = document.getElementById('contato-central');
-                    if(tipo === 'neutro') {
-                        n_connected = true;
-                        log.innerHTML = "✅ Neutro conectado à base rosqueada.";
-                    }
-                    if(tipo === 'retorno') {
-                        r_connected = true;
-                        central.style.background = "#f1c40f";
-                        central.style.boxShadow = "0 0 10px #f1c40f";
-                        log.innerHTML = "✅ Retorno conectado ao disco central.";
-                    }
-                    if(n_connected && r_connected) {
-                        log.innerHTML = "💡 CIRCUITO PRONTO! Lâmpada pode ser acionada.";
-                        log.style.color = "#27ae60";
-                    }
-                }
-            `
-        },
         pagina: "Aula 01 - Pág 2"
     },
     "instalacoes_eletricas_prediais_01_p3": {
@@ -206,24 +203,22 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
                     </div>
                     <p id="status-qdc" style="font-size: 11px; margin-top: 10px; text-align: center; font-family: monospace;">Status: Normal</p>
                 </div>
+                <script>
+                    window.simularCurto = function() {
+                        const d = document.getElementById('dj-luz');
+                        d.style.transform = "rotate(180deg)";
+                        d.style.background = "#7f8c8d";
+                        document.getElementById('status-qdc').innerHTML = "⚠️ Curto detectado! Disjuntor desarmado.";
+                    };
+                    window.resetarQuadro = function() {
+                        const d = document.getElementById('dj-luz');
+                        d.style.transform = "rotate(0deg)";
+                        d.style.background = "#27ae60";
+                        document.getElementById('status-qdc').innerHTML = "Status: Normal";
+                    };
+                </script>
             </div>
         `,
-        interatividade: {
-            script: `
-                function simularCurto() {
-                    const d = document.getElementById('dj-luz');
-                    d.style.transform = "rotate(180deg)";
-                    d.style.background = "#7f8c8d";
-                    document.getElementById('status-qdc').innerHTML = "⚠️ Curto detectado! Disjuntor desarmado.";
-                }
-                function resetarQuadro() {
-                    const d = document.getElementById('dj-luz');
-                    d.style.transform = "rotate(0deg)";
-                    d.style.background = "#27ae60";
-                    document.getElementById('status-qdc').innerHTML = "Status: Normal";
-                }
-            `
-        },
         pagina: "Aula 01 - Pág 3"
     }
 });
