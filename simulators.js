@@ -130,7 +130,7 @@ window.SimulatorLogic = {
     },
 
     // Aula 02 Logic (Expansion)
-    aula2_switch: false,
+   aula2_switch: false,
     toggleAula2() {
         const lamp = document.getElementById('lamp-aula2');
         const sw = document.getElementById('switch-visual-aula2');
@@ -152,10 +152,9 @@ window.SimulatorLogic = {
             if(sw) sw.style.transform = "rotate(20deg)";
             if(log) log.innerHTML = "⚪ Circuito Aberto: Interruptor seccionou a Fase.";
         }
-    }
-};
+    }, // --- FIX IS HERE: Replaced }; with a comma to keep the object open ---
 
-// NEW: Game Logic for Page 4 (Wiring Challenge)
+    // NEW: Game Logic for Page 4 (Wiring Challenge)
     gameState: { fase: false, retorno: false, neutro: false, terra: false },
     
     gameConnect(fio, destino) {
@@ -224,4 +223,3 @@ window.SimulatorLogic = {
         }
     }
 };
-
