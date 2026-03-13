@@ -156,12 +156,47 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
         </div>
     `,
     pagina: "Aula 01 - Pág 2"
+
+     },
+
+  
+    "instalacoes_eletricas_prediais_02": {
+        keywords: ["diagrama", "ponto de luz", "esquema unifilar", "ligação", "esboço"],
+        fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+        titulo: "Aula 1: Diagrama de Ligação (Pág 3)",
+        icone: "📝",
+        resumo: "Simulador de fluxo baseado no esboço técnico do ponto de luz.",
+        html_content: `
+            <div style="line-height: 1.6; color: #333; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+                <h4 style="color: #2c3e50; border-bottom: 2px solid #d35400; padding-bottom: 5px;">Esquema Técnico: Fluxo de Potência</h4>
+                <div style="background: #f9f9f9; padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #eee;">
+                    <svg viewBox="0 0 400 280" style="width: 100%; max-width: 400px; height: auto;">
+                        <line x1="20" y1="40" x2="380" y2="40" stroke="#ccc" stroke-width="6" stroke-dasharray="5,5" />
+                        <text x="200" y="30" font-size="12" text-anchor="middle" font-weight="bold">Ponto de Luz (Eletroduto)</text>
+                        
+                        <path d="M 180,40 L 180,90" stroke="#2980b9" stroke-width="2" /> <path d="M 220,40 L 220,80 L 110,80 L 110,200" stroke="#f39c12" stroke-width="2" fill="none" /> <path d="M 200,40 L 100,40 L 100,200" stroke="#c0392b" stroke-width="2" fill="none" /> <circle cx="180" cy="110" r="15" id="lamp-aula2" fill="#bbb" stroke="#333" style="transition: 0.3s;" />
+                        <text x="200" y="115" font-size="10">Luminária</text>
+
+                        <rect x="85" y="200" width="30" height="40" fill="#fff" stroke="#333" />
+                        <line id="switch-visual-aula2" x1="100" y1="225" x2="115" y2="210" stroke="#333" stroke-width="4" style="transition: 0.2s; transform-origin: 100px 225px; transform: rotate(20deg);" />
+                    </svg>
+
+                    <div style="margin-top: 15px;">
+                        <button onclick="SimulatorLogic.toggleAula2()" style="background: #2c3e50; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer;">
+                            Acionar Interruptor
+                        </button>
+                    </div>
+                    <div id="log-aula2" style="margin-top: 10px; font-family: monospace; font-size: 12px; color: #7f8c8d;">Circuito aberto.</div>
+                </div>
+            </div>
+        `,
+        pagina: "Aula 01 - Pág 3"
 },
     
-    "instalacoes_eletricas_prediais_01_p3": {
+    "instalacoes_eletricas_prediais_01_p4": {
         keywords: ["quadro de distribuição", "disjuntor", "circuitos", "DR", "DPS", "barramento"],
         fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
-        titulo: "Aula 1: O Quadro de Distribuição (Pág 3)",
+        titulo: "Aula 1: O Quadro de Distribuição (Pág 4)",
         icone: "🎛️",
         resumo: "O cérebro da instalação: organização de circuitos, proteção térmica e seccionamento.",
         html_content: `
@@ -204,7 +239,7 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
                 </script>
             </div>
         `,
-        pagina: "Aula 01 - Pág 3"
+        pagina: "Aula 01 - Pág 4"
     }
 });
 
