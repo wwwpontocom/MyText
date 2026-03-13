@@ -91,88 +91,73 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
         pagina: "Aula 01 - Pág 1"
     },
 
-   "instalacoes_eletricas_prediais_01_p2": {
-        keywords: ["luz artificial", "interruptor simples", "fase", "neutro", "terra", "retorno", "NBR 5410"],
-        fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
-        titulo: "Aula 1: Componentes e Conexões (Pág 2)",
-        icone: "🔌",
-        resumo: "Detalhamento técnico dos condutores e anatomia da conexão em luminárias.",
-        html_content: `
-            <div style="line-height: 1.6; color: #333; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
-                <div style="display: flex; justify-content: space-between; font-size: 11px; color: #777; margin-bottom: 10px;">
-                    <span>← Pág 1: Conceitos Iniciais</span>
-                    <span>Pág 3: Quadro de Distribuição →</span>
-                </div>
-
-                <h4 style="color: #d35400;">1. A Anatomia do Ponto de Luz</h4>
-                <p>O provimento de luz não é apenas estético; exige uma infraestrutura de quatro vias para garantir funcionamento e segurança (NBR 5410):</p>
-                
-                <table style="width:100%; border-collapse: collapse; font-size: 12px; margin-bottom: 15px;">
-                    <tr style="background: #f2f2f2;">
-                        <th style="border: 1px solid #ccc; padding: 5px;">Condutor</th>
-                        <th style="border: 1px solid #ccc; padding: 5px;">Função Técnica</th>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ccc; padding: 5px;"><b>Fase (L)</b></td>
-                        <td style="border: 1px solid #ccc; padding: 5px;">Traz o potencial. Nunca vai direto à lâmpada; deve passar pelo interruptor.</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ccc; padding: 5px; color: #2980b9;"><b>Neutro (N)</b></td>
-                        <td style="border: 1px solid #ccc; padding: 5px;">Referência zero. Conecta-se diretamente à <b>base rosqueada</b> (rosca) da luminária.</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ccc; padding: 5px; color: #27ae60;"><b>Terra (PE)</b></td>
-                        <td style="border: 1px solid #ccc; padding: 5px;">Proteção. Conecta-se à carcaça metálica da luminária para escoar fugas.</td>
-                    </tr>
-                    <tr>
-                        <td style="border: 1px solid #ccc; padding: 5px; color: #f39c12;"><b>Retorno (R)</b></td>
-                        <td style="border: 1px solid #ccc; padding: 5px;">A "fase seccionada". Conecta o interruptor ao <b>disco central</b> (contato fundo) da luminária.</td>
-                    </tr>
-                </table>
-
-                <h4 style="color: #d35400;">2. Laboratório: Montagem do Soquete</h4>
-                <div id="box-aula-eletrica" style="background: #f9f9f9; padding: 20px; border-radius: 10px; border: 1px solid #eee; text-align: center;">
-                    <div style="display: inline-block; text-align: left; background: #fff; padding: 15px; border: 2px solid #333; border-radius: 50%; width: 120px; height: 120px; position: relative;">
-                        <div style="border: 5px solid #bdc3c7; border-radius: 50%; width: 80px; height: 80px; margin: 15px auto; position: relative;">
-                            <div id="contato-central" style="width: 20px; height: 20px; background: #ccc; border-radius: 50%; position: absolute; top: 30px; left: 30px;"></div>
-                        </div>
-                        <p style="position: absolute; bottom: -30px; left: 20px; font-size: 10px; font-weight: bold;">LUMINÁRIA (BASE)</p>
-                    </div>
-                  <div style="margin-top: 40px; display: flex; justify-content: center; gap: 10px;">
-    <button class="btn-tool" onclick="SimulatorLogic.conectarFio('neutro')" style="background: #2980b9; color: white; border: none; padding: 5px 10px; cursor: pointer;">Ligar Neutro na Rosca</button>
-    <button class="btn-tool" onclick="SimulatorLogic.conectarFio('retorno')" style="background: #f39c12; color: white; border: none; padding: 5px 10px; cursor: pointer;">Ligar Retorno no Centro</button>
-</div>
-                    <div id="log-conexao" style="margin-top: 15px; font-size: 12px; font-family: monospace; color: #e67e22;">Aguardando conexões...</div>
-                </div>
-                <p style="font-size: 12px; margin-top: 15px; background: #fff3cd; padding: 10px; border-radius: 5px;">
-                    <b>Nota do Professor:</b> O Neutro na rosca evita choques acidentais durante a troca da lâmpada.
-                </p>
-                <script>
-                    window.n_connected = false;
-                    window.r_connected = false;
-                    window.conectarFio = function(tipo) {
-                        const log = document.getElementById('log-conexao');
-                        const central = document.getElementById('contato-central');
-                        if(tipo === 'neutro') {
-                            window.n_connected = true;
-                            log.innerHTML = "✅ Neutro conectado à base rosqueada.";
-                        }
-                        if(tipo === 'retorno') {
-                            window.r_connected = true;
-                            central.style.background = "#f1c40f";
-                            central.style.boxShadow = "0 0 10px #f1c40f";
-                            log.innerHTML = "✅ Retorno conectado ao disco central.";
-                        }
-                        if(window.n_connected && window.r_connected) {
-                            log.innerHTML = "💡 CIRCUITO PRONTO! Lâmpada pode ser acionada.";
-                            log.style.color = "#27ae60";
-                        }
-                    };
-                </script>
+ "instalacoes_eletricas_prediais_01_p2": {
+    keywords: ["luz artificial", "interruptor simples", "fase", "neutro", "terra", "retorno", "NBR 5410"],
+    fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+    titulo: "Aula 1: Componentes e Conexões (Pág 2)",
+    icone: "🔌",
+    resumo: "Detalhamento técnico dos condutores e anatomia da conexão em luminárias.",
+    html_content: `
+        <div style="line-height: 1.6; color: #333; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+            <div style="display: flex; justify-content: space-between; font-size: 11px; color: #777; margin-bottom: 10px;">
+                <span>← Pág 1: Conceitos Iniciais</span>
+                <span>Pág 3: Quadro de Distribuição →</span>
             </div>
-        `,
-        pagina: "Aula 01 - Pág 2"
-    },
+
+            <h4 style="color: #d35400;">1. A Anatomia do Ponto de Luz</h4>
+            <p>O provimento de luz exige uma infraestrutura de quatro vias (NBR 5410):</p>
+            
+            <table style="width:100%; border-collapse: collapse; font-size: 11px; margin-bottom: 15px;">
+                <tr style="background: #f2f2f2;">
+                    <th style="border: 1px solid #ccc; padding: 5px;">Condutor</th>
+                    <th style="border: 1px solid #ccc; padding: 5px;">Função Técnica</th>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 5px;"><b>Fase (L)</b></td>
+                    <td style="border: 1px solid #ccc; padding: 5px;">Traz o potencial. Passa pelo interruptor.</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 5px; color: #2980b9;"><b>Neutro (N)</b></td>
+                    <td style="border: 1px solid #ccc; padding: 5px;">Referência zero. Conecta-se à <b>rosca</b>.</td>
+                </tr>
+                <tr>
+                    <td style="border: 1px solid #ccc; padding: 5px; color: #f39c12;"><b>Retorno (R)</b></td>
+                    <td style="border: 1px solid #ccc; padding: 5px;">Fase seccionada. Conecta-se ao <b>centro</b>.</td>
+                </tr>
+            </table>
+
+            <h4 style="color: #d35400;">2. Laboratório: Montagem do Soquete</h4>
+            <div id="box-aula-eletrica" style="background: #f1f1f1; padding: 30px 20px; border-radius: 10px; border: 1px solid #eee; text-align: center; position: relative; overflow: hidden;">
+                
+                <div style="display: inline-block; background: #fff; padding: 15px; border: 2px solid #333; border-radius: 50%; width: 120px; height: 120px; position: relative; z-index: 2;">
+                    <svg style="position: absolute; top: -40px; left: -40px; width: 200px; height: 200px; pointer-events: none; z-index: 1;">
+                        <path id="fio-neutro" d="M 20,100 Q 50,150 90,120" stroke="#2980b9" stroke-width="4" fill="none" style="opacity: 0; transition: opacity 0.5s;" />
+                        <path id="fio-retorno" d="M 180,100 Q 150,150 110,110" stroke="#f39c12" stroke-width="4" fill="none" style="opacity: 0; transition: opacity 0.5s;" />
+                    </svg>
+
+                    <span id="lampada-visual" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 50px; color: #bbb; z-index: 4; transition: all 0.5s ease;">💡</span>
+
+                    <div style="border: 5px solid #bdc3c7; border-radius: 50%; width: 80px; height: 80px; margin: 15px auto; position: relative; z-index: 3; background: rgba(255,255,255,0.8);">
+                        <div id="contato-central" style="width: 20px; height: 20px; background: #ccc; border-radius: 50%; position: absolute; top: 30px; left: 30px; transition: background 0.3s;"></div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 50px; display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; position: relative; z-index: 5;">
+                    <button class="btn-tool" onclick="SimulatorLogic.conectarFio('neutro')" style="background: #2980b9; color: white; border: none; padding: 8px 10px; cursor: pointer; border-radius: 4px; font-size: 11px;">Ligar Neutro</button>
+                    <button class="btn-tool" onclick="SimulatorLogic.conectarFio('retorno')" style="background: #f39c12; color: white; border: none; padding: 8px 10px; cursor: pointer; border-radius: 4px; font-size: 11px;">Ligar Retorno</button>
+                    <button id="btn-switch" class="btn-tool" onclick="SimulatorLogic.alternarInterruptor()" style="background: #95a5a6; color: white; border: none; padding: 8px 10px; cursor: pointer; border-radius: 4px; font-size: 11px;">Interruptor: OFF</button>
+                    <button class="btn-tool" onclick="SimulatorLogic.resetarSoquete()" style="background: #6c757d; color: white; border: none; padding: 8px 10px; cursor: pointer; border-radius: 4px; font-size: 11px;">🔄 Reset</button>
+                </div>
+                <div id="log-conexao" style="margin-top: 15px; font-size: 12px; font-family: monospace; font-weight: bold; color: #e67e22; min-height: 1.5em;">Aguardando conexões...</div>
+            </div>
+            <p style="font-size: 11px; margin-top: 15px; background: #fff3cd; padding: 8px; border-radius: 5px;">
+                <b>Nota:</b> O Neutro na rosca evita choques durante a troca da lâmpada.
+            </p>
+        </div>
+    `,
+    pagina: "Aula 01 - Pág 2"
+},
+    
     "instalacoes_eletricas_prediais_01_p3": {
         keywords: ["quadro de distribuição", "disjuntor", "circuitos", "DR", "DPS", "barramento"],
         fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
