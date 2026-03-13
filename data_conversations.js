@@ -213,6 +213,46 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
         `,
         pagina: "Aula 01 - Pág 3"
 },
+
+    "instalacoes_eletricas_prediais_01_p4": {
+    keywords: ["game", "ligação", "conexão", "prática", "desafio"],
+    fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+    titulo: "Aula 1: Desafio de Conexões (Pág 4)",
+    icone: "ok",
+    resumo: "Laboratório interativo para montagem do circuito completo ponto a ponto.",
+    html_content: `
+        <div style="line-height: 1.6; color: #333; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fff; font-family: sans-serif;">
+            
+            <h3 style="color: #2c3e50; border-left: 5px solid #27ae60; padding-left: 10px;">🎮 Desafio: Monte o Circuito</h3>
+            <p style="font-size: 13px;">Com base na norma <b>NBR 5410</b> e no diagrama técnico, conecte cada condutor ao seu destino correto para acender a lâmpada com segurança.</p>
+
+            <div style="background: #f1f1f1; padding: 20px; border-radius: 10px; border: 1px solid #ccc; position: relative; overflow: hidden; text-align: center;">
+                <svg viewBox="0 0 400 300" style="width: 100%; max-width: 400px; height: auto; background: #fff; border-radius: 5px; border: 1px solid #eee;">
+                    <rect x="150" y="80" width="100" height="60" fill="none" stroke="#bdc3c7" stroke-dasharray="4" stroke-width="2" /> <text x="200" y="75" font-size="10" text-anchor="middle">Luminária Metálica</text>
+                    
+                    <circle id="term-sw" cx="100" cy="240" r="6" fill="#ecf0f1" stroke="#333" /> <circle id="term-disco" cx="190" cy="110" r="4" fill="#ecf0f1" stroke="#333" /> <circle id="term-base" cx="210" cy="110" r="4" fill="#ecf0f1" stroke="#333" /> <circle id="term-terra" cx="240" cy="90" r="4" fill="#ecf0f1" stroke="#333" /> <path id="lamp-game" d="M 185,140 Q 185,170 200,175 Q 215,170 215,140 Z" fill="#eee" stroke="#333" style="transition: 0.5s;" />
+                    
+                    <text x="80" y="245" font-size="8" text-anchor="end">Interruptor</text>
+                    <text x="250" y="95" font-size="8">Proteção (Terra)</text>
+                </svg>
+
+                <div style="margin-top: 15px; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                    <button class="btn-game" onclick="SimulatorLogic.gameConnect('fase', 'sw')" style="background: #c0392b; color: white; border: none; padding: 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Ligar Fase no Interruptor</button>
+                    <button class="btn-game" onclick="SimulatorLogic.gameConnect('retorno', 'disco')" style="background: #f39c12; color: white; border: none; padding: 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Ligar Retorno no Disco Central</button>
+                    <button class="btn-game" onclick="SimulatorLogic.gameConnect('neutro', 'base')" style="background: #2980b9; color: white; border: none; padding: 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Ligar Neutro na Base Rosqueada</button>
+                    <button class="btn-game" onclick="SimulatorLogic.gameConnect('terra', 'terra')" style="background: #27ae60; color: white; border: none; padding: 8px; border-radius: 4px; font-size: 11px; cursor: pointer;">Ligar Terra na Carcaça</button>
+                </div>
+
+                <div id="game-feedback" style="margin-top: 15px; padding: 10px; background: #fff; border-radius: 5px; font-size: 12px; min-height: 40px; border-left: 4px solid #7f8c8d;">
+                    Escolha um condutor para iniciar a instalação.
+                </div>
+                
+                <button onclick="SimulatorLogic.gameReset()" style="margin-top: 10px; background: #eee; border: 1px solid #ccc; padding: 5px 10px; font-size: 10px; border-radius: 3px; cursor: pointer;">🔄 Reiniciar Desafio</button>
+            </div>
+        </div>
+    `,
+    pagina: "Aula 01 - Pág 4"
+}
     
     "instalacoes_eletricas_prediais_01_p4": {
         keywords: ["quadro de distribuição", "disjuntor", "circuitos", "DR", "DPS", "barramento"],
