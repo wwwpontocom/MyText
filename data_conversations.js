@@ -138,10 +138,10 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
                         </div>
                         <p style="position: absolute; bottom: -30px; left: 20px; font-size: 10px; font-weight: bold;">LUMINÁRIA (BASE)</p>
                     </div>
-                    <div style="margin-top: 40px; display: flex; justify-content: center; gap: 10px;">
-                        <button class="btn-tool" onclick="conectarFio('neutro')" style="background: #2980b9; color: white; border: none; padding: 5px 10px; cursor: pointer;">Ligar Neutro na Rosca</button>
-                        <button class="btn-tool" onclick="conectarFio('retorno')" style="background: #f39c12; color: white; border: none; padding: 5px 10px; cursor: pointer;">Ligar Retorno no Centro</button>
-                    </div>
+                  <div style="margin-top: 40px; display: flex; justify-content: center; gap: 10px;">
+    <button class="btn-tool" onclick="SimulatorLogic.conectarFio('neutro')" style="background: #2980b9; color: white; border: none; padding: 5px 10px; cursor: pointer;">Ligar Neutro na Rosca</button>
+    <button class="btn-tool" onclick="SimulatorLogic.conectarFio('retorno')" style="background: #f39c12; color: white; border: none; padding: 5px 10px; cursor: pointer;">Ligar Retorno no Centro</button>
+</div>
                     <div id="log-conexao" style="margin-top: 15px; font-size: 12px; font-family: monospace; color: #e67e22;">Aguardando conexões...</div>
                 </div>
                 <p style="font-size: 12px; margin-top: 15px; background: #fff3cd; padding: 10px; border-radius: 5px;">
@@ -197,10 +197,10 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
                         <div id="dj-geral" style="width: 30px; height: 50px; background: #c0392b; border: 1px solid #fff;"></div>
                         <div id="dj-luz" style="width: 25px; height: 40px; background: #27ae60; border: 1px solid #fff;"></div>
                     </div>
-                    <div style="margin-top: 20px; text-align: center;">
-                        <button class="btn-tool" onclick="simularCurto()" style="background: #e67e22; color: white; border: none; padding: 5px 10px; cursor: pointer;">Simular Curto</button>
-                        <button class="btn-tool" onclick="resetarQuadro()" style="background: #3498db; color: white; border: none; padding: 5px 10px; cursor: pointer;">Resetar</button>
-                    </div>
+                 <div style="margin-top: 20px; text-align: center;">
+    <button class="btn-tool" onclick="SimulatorLogic.simularCurto()" style="background: #e67e22; color: white; border: none; padding: 5px 10px; cursor: pointer;">Simular Curto</button>
+    <button class="btn-tool" onclick="SimulatorLogic.resetarQuadro()" style="background: #3498db; color: white; border: none; padding: 5px 10px; cursor: pointer;">Resetar</button>
+</div>
                     <p id="status-qdc" style="font-size: 11px; margin-top: 10px; text-align: center; font-family: monospace;">Status: Normal</p>
                 </div>
                 <script>
