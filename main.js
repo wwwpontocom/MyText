@@ -119,6 +119,10 @@ function getSmartIntroduction(entry) {
 
 window.askSmartAI = function(query) {
     if (!query || query.length < 2 || !aiContent) return;
+    if (window.SimulatorLogic) {
+        SimulatorLogic.n_connected = false;
+        SimulatorLogic.r_connected = false;
+    }
     const text = query.toLowerCase().trim();
     const brain = getLibraryData();
 
