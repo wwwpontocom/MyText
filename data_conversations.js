@@ -168,6 +168,27 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
         resumo: "Simulador de fluxo baseado no esboço técnico do ponto de luz.",
         html_content: `
             <div style="line-height: 1.6; color: #333; padding: 15px; border: 1px solid #ddd; border-radius: 8px; background: #fff;">
+                
+               
+                <h3 style="color: #2c3e50; border-left: 5px solid #d35400; padding-left: 10px;">📘 Material Didático: Aula 02 — Circuitos e Comandos</h3>
+
+            <h4 style="color: #d35400; margin-top: 20px;">1. O Conceito de Seccionamento</h4>
+            <p>No laboratório da <b>Aula 02</b>, exploramos o princípio fundamental da segurança em iluminação: o <b>Seccionamento da Fase</b>.</p>
+            <p>Diferente de um circuito contínuo, um ponto de luz em uma edificação é um "circuito interrompível". De acordo com a <b>NBR 5410</b>, o dispositivo de manobra (interruptor) deve sempre atuar sobre o condutor <b>Fase</b>.</p>
+            
+            <blockquote style="background: #fdf2f2; border-left: 5px solid #e74c3c; padding: 10px; margin: 10px 0; font-size: 0.9em;">
+                <b>Por que não seccionar o Neutro?</b> Se interrompêssemos o Neutro, a luminária permaneceria energizada (com potencial elétrico) mesmo com a luz apagada, oferecendo risco de choque fatal durante uma manutenção simples.
+            </blockquote>
+
+            <h4 style="color: #d35400; margin-top: 20px;">2. A Hierarquia dos Condutores no Esquema</h4>
+            <p>Identificamos o percurso da energia através de três atores principais:</p>
+            <ul style="font-size: 0.95em;">
+                <li><b>Fase (Vermelho/Preto):</b> Sai do Disjuntor (QDC) e desce para o interruptor. Ela "espera" o comando humano.</li>
+                <li><b>Retorno (Amarelo):</b> É a continuação da Fase após o interruptor. Leva o potencial ao centro do soquete.</li>
+                <li><b>Neutro (Azul Claro):</b> Vai direto do QDC ao ponto de luz, fechando o circuito na base rosqueada.</li>
+            </ul>
+                
+                
                 <h4 style="color: #2c3e50; border-bottom: 2px solid #d35400; padding-bottom: 5px;">Esquema Técnico: Fluxo de Potência</h4>
                 <div style="background: #f9f9f9; padding: 20px; border-radius: 10px; text-align: center; border: 1px solid #eee;">
                     <svg viewBox="0 0 400 280" style="width: 100%; max-width: 400px; height: auto;">
