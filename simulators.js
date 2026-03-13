@@ -1,6 +1,8 @@
-// simulators.js
-const SimulatorLogic = {
-    // Lesson 01 - Page 2: Socket Assembly
+// simulators.js - Logic for Architectural & Electrical Simulators
+// --- FIX IS HERE: Ensuring global access and complete logic for all pages ---
+
+window.SimulatorLogic = {
+    // Lesson 01 - Page 2: Socket Assembly State
     n_connected: false,
     r_connected: false,
     
@@ -25,7 +27,7 @@ const SimulatorLogic = {
         }
     },
 
-    // Lesson 01 - Page 3: Breaker Panel
+    // Lesson 01 - Page 3: Breaker Panel (QDC) Logic
     simularCurto() {
         const d = document.getElementById('dj-luz');
         const status = document.getElementById('status-qdc');
