@@ -108,7 +108,7 @@ window.SimulatorLogic = {
         this.atualizarLampada();
     },
 
-    // Lesson 01 - Page 4: Breaker Panel (QDC) Logic
+    // Lesson 01 - Page 5: Breaker Panel (QDC) Logic
     simularCurto() {
         const d = document.getElementById('dj-luz');
         const status = document.getElementById('status-qdc');
@@ -155,23 +155,18 @@ window.SimulatorLogic = {
     }
 };
 
-// Add these to your existing window.SimulatorLogic object
-window.SimulatorLogic = {
-    // ... (previous logic for Lesson 01 and 02 remains)
-
-    // NEW: Game Logic for Page 4
+// NEW: Game Logic for Page 4 (Wiring Challenge)
     gameState: { fase: false, retorno: false, neutro: false, terra: false },
     
     gameConnect(fio, destino) {
         const feedback = document.getElementById('game-feedback');
         const term = document.getElementById('term-' + destino);
         
-        if (this.gameState[fio]) return; // Já conectado
+        if (this.gameState[fio]) return; 
 
         let msg = "";
         let color = "#333";
 
-        // Logic & Pedagogy based on User Images
         if (fio === 'fase' && destino === 'sw') {
             msg = "<b>Fase ligada!</b> Conforme a NBR 5410, a fase deve ser seccionada pelo interruptor para garantir que o bocal não fique energizado ao desligar.";
             color = "#c0392b";
@@ -191,8 +186,10 @@ window.SimulatorLogic = {
         }
 
         if (term) term.setAttribute('fill', color);
-        feedback.innerHTML = msg;
-        feedback.style.borderLeftColor = color;
+        if (feedback) {
+            feedback.innerHTML = msg;
+            feedback.style.borderLeftColor = color;
+        }
         
         this.checkVictory();
     },
@@ -205,8 +202,10 @@ window.SimulatorLogic = {
                 lamp.setAttribute('fill', '#f1c40f');
                 lamp.style.filter = "drop-shadow(0 0 15px #f1c40f)";
             }
-            feedback.innerHTML = "<b>✨ SUCESSO!</b> Circuito completo e seguro. A lâmpada acendeu seguindo todas as normas técnicas.";
-            feedback.style.borderLeftColor = "#27ae60";
+            if (feedback) {
+                feedback.innerHTML = "<b>✨ SUCESSO!</b> Circuito completo e seguro. A lâmpada acendeu seguindo todas as normas técnicas.";
+                feedback.style.borderLeftColor = "#27ae60";
+            }
         }
     },
 
@@ -218,7 +217,11 @@ window.SimulatorLogic = {
             const t = document.getElementById('term-' + id);
             if (t) t.setAttribute('fill', '#ecf0f1');
         });
-        document.getElementById('game-feedback').innerHTML = "Escolha um condutor para iniciar a instalação.";
-        document.getElementById('game-feedback').style.borderLeftColor = "#7f8c8d";
+        const feedback = document.getElementById('game-feedback');
+        if (feedback) {
+            feedback.innerHTML = "Escolha um condutor para iniciar a instalação.";
+            feedback.style.borderLeftColor = "#7f8c8d";
+        }
     }
 };
+
