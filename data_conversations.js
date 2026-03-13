@@ -252,7 +252,7 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
         </div>
     `,
     pagina: "Aula 01 - Pág 4"
-}
+},
     
     "instalacoes_eletricas_prediais_01_p5": {
         keywords: ["quadro de distribuição", "disjuntor", "circuitos", "DR", "DPS", "barramento"],
