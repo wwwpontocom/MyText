@@ -1,30 +1,111 @@
 // simulators.js - Logic for Architectural & Electrical Simulators
-// --- FIX IS HERE: Ensuring global access and complete logic for all pages ---
+// --- FIX IS HERE: Enhanced Socket Assembly with Switch Logic and Safety Checks ---
 
 window.SimulatorLogic = {
     // Lesson 01 - Page 2: Socket Assembly State
     n_connected: false,
     r_connected: false,
+    sw_on: false,
     
     conectarFio(tipo) {
         const log = document.getElementById('log-conexao');
+        const fn = document.getElementById('fio-neutro');
+        const fr = document.getElementById('fio-retorno');
         const central = document.getElementById('contato-central');
-        if(!log || !central) return;
+
+        if(!log) return;
+
+        // Safety Check: Avoid "shocks" if switch is already closed
+        if(this.sw_on) {
+            log.innerHTML = "⚠️ PERIGO: Desligue o interruptor antes de manusear os fios!";
+            log.style.color = "#c0392b";
+            return;
+        }
 
         if(tipo === 'neutro') {
             this.n_connected = true;
+            if(fn) fn.style.opacity = "1";
             log.innerHTML = "✅ Neutro conectado à base rosqueada.";
+            log.style.color = "#2980b9";
         }
         if(tipo === 'retorno') {
             this.r_connected = true;
-            central.style.background = "#f1c40f";
-            central.style.boxShadow = "0 0 10px #f1c40f";
+            if(fr) fr.style.opacity = "1";
+            if(central) {
+                central.style.background = "#f1c40f";
+                central.style.boxShadow = "0 0 10px #f1c40f";
+            }
             log.innerHTML = "✅ Retorno conectado ao disco central.";
+            log.style.color = "#f39c12";
         }
-        if(this.n_connected && this.r_connected) {
-            log.innerHTML = "💡 CIRCUITO PRONTO! Lâmpada pode ser acionada.";
-            log.style.color = "#27ae60";
+        this.atualizarLampada();
+    },
+
+    alternarInterruptor() {
+        const btn = document.getElementById('btn-switch');
+        const log = document.getElementById('log-conexao');
+        this.sw_on = !this.sw_on;
+
+        if(btn) {
+            btn.innerHTML = this.sw_on ? "Interruptor: LIGADO" : "Interruptor: DESLIGADO";
+            btn.style.background = this.sw_on ? "#27ae60" : "#95a5a6";
         }
+
+        if(this.sw_on && (!this.n_connected || !this.r_connected)) {
+            if(log) {
+                log.innerHTML = "⚠️ Circuito aberto: conecte os fios primeiro.";
+                log.style.color = "#e67e22";
+            }
+        }
+        
+        this.atualizarLampada();
+    },
+
+    atualizarLampada() {
+        const lamp = document.getElementById('lampada-visual');
+        const log = document.getElementById('log-conexao');
+        
+        if(this.n_connected && this.r_connected && this.sw_on) {
+            if(lamp) {
+                lamp.style.color = "#f1c40f";
+                lamp.style.textShadow = "0 0 20px #f1c40f, 0 0 40px #f1c40f";
+                lamp.style.transform = "translate(-50%, -50%) scale(1.2)";
+            }
+            if(log) {
+                log.innerHTML = "💡 LÂMPADA ACESA! Instalação concluída com sucesso.";
+                log.style.color = "#27ae60";
+            }
+        } else {
+            if(lamp) {
+                lamp.style.color = "#bbb";
+                lamp.style.textShadow = "none";
+                lamp.style.transform = "translate(-50%, -50%) scale(1)";
+            }
+        }
+    },
+
+    resetarSoquete() {
+        this.n_connected = false;
+        this.r_connected = false;
+        this.sw_on = false;
+        
+        const btn = document.getElementById('btn-switch');
+        if(btn) { 
+            btn.innerHTML = "Interruptor: DESLIGADO"; 
+            btn.style.background = "#95a5a6"; 
+        }
+        
+        const fn = document.getElementById('fio-neutro');
+        const fr = document.getElementById('fio-retorno');
+        const central = document.getElementById('contato-central');
+        const log = document.getElementById('log-conexao');
+        
+        if(fn) fn.style.opacity = "0";
+        if(fr) fr.style.opacity = "0";
+        if(central) { central.style.background = "#ccc"; central.style.boxShadow = "none"; }
+        if(log) { log.innerHTML = "Aguardando conexões..."; log.style.color = "#e67e22"; }
+        
+        this.atualizarLampada();
     },
 
     // Lesson 01 - Page 3: Breaker Panel (QDC) Logic
