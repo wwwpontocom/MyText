@@ -154,3 +154,71 @@ window.SimulatorLogic = {
         }
     }
 };
+
+// Add these to your existing window.SimulatorLogic object
+window.SimulatorLogic = {
+    // ... (previous logic for Lesson 01 and 02 remains)
+
+    // NEW: Game Logic for Page 4
+    gameState: { fase: false, retorno: false, neutro: false, terra: false },
+    
+    gameConnect(fio, destino) {
+        const feedback = document.getElementById('game-feedback');
+        const term = document.getElementById('term-' + destino);
+        
+        if (this.gameState[fio]) return; // Já conectado
+
+        let msg = "";
+        let color = "#333";
+
+        // Logic & Pedagogy based on User Images
+        if (fio === 'fase' && destino === 'sw') {
+            msg = "<b>Fase ligada!</b> Conforme a NBR 5410, a fase deve ser seccionada pelo interruptor para garantir que o bocal não fique energizado ao desligar.";
+            color = "#c0392b";
+            this.gameState.fase = true;
+        } else if (fio === 'retorno' && destino === 'disco') {
+            msg = "<b>Retorno ligado!</b> O retorno conecta a saída do interruptor ao disco central da lâmpada, completando o caminho da fase.";
+            color = "#f39c12";
+            this.gameState.retorno = true;
+        } else if (fio === 'neutro' && destino === 'base') {
+            msg = "<b>Neutro ligado!</b> Deve ser conectado na base rosqueada para evitar choque elétrico se alguém tocar na rosca durante a troca.";
+            color = "#2980b9";
+            this.gameState.neutro = true;
+        } else if (fio === 'terra' && destino === 'terra') {
+            msg = "<b>Terra ligado!</b> Conectado à carcaça metálica da luminária para desviar correntes de fuga e proteger o usuário.";
+            color = "#27ae60";
+            this.gameState.terra = true;
+        }
+
+        if (term) term.setAttribute('fill', color);
+        feedback.innerHTML = msg;
+        feedback.style.borderLeftColor = color;
+        
+        this.checkVictory();
+    },
+
+    checkVictory() {
+        const lamp = document.getElementById('lamp-game');
+        const feedback = document.getElementById('game-feedback');
+        if (this.gameState.fase && this.gameState.retorno && this.gameState.neutro && this.gameState.terra) {
+            if (lamp) {
+                lamp.setAttribute('fill', '#f1c40f');
+                lamp.style.filter = "drop-shadow(0 0 15px #f1c40f)";
+            }
+            feedback.innerHTML = "<b>✨ SUCESSO!</b> Circuito completo e seguro. A lâmpada acendeu seguindo todas as normas técnicas.";
+            feedback.style.borderLeftColor = "#27ae60";
+        }
+    },
+
+    gameReset() {
+        this.gameState = { fase: false, retorno: false, neutro: false, terra: false };
+        const lamp = document.getElementById('lamp-game');
+        if (lamp) { lamp.setAttribute('fill', '#eee'); lamp.style.filter = "none"; }
+        ['sw', 'disco', 'base', 'terra'].forEach(id => {
+            const t = document.getElementById('term-' + id);
+            if (t) t.setAttribute('fill', '#ecf0f1');
+        });
+        document.getElementById('game-feedback').innerHTML = "Escolha um condutor para iniciar a instalação.";
+        document.getElementById('game-feedback').style.borderLeftColor = "#7f8c8d";
+    }
+};
