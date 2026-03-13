@@ -253,11 +253,129 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
     `,
     pagina: "Aula 01 - Pág 4"
 },
-    
+
     "instalacoes_eletricas_prediais_01_p5": {
+    keywords: ["simulador", "NBR 5410", "quadro", "multímetro", "instalação"],
+    fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+    titulo: "Aula 1: Simulador de Instalação Residencial (Pág 5)",
+    icone: "bolt",
+    resumo: "Laboratório avançado com Quadro de Distribuição, Multímetro funcional e teste de carga.",
+    html_content: `
+        <style>
+            :root {
+                --fase: #ff0000; --neutro: #0000ff; --protecao: #32cd32;
+                --retorno: #000000; --bg-wall: #dfe6e9;
+            }
+            .sim-container { font-family: 'Segoe UI', sans-serif; background: #fff; color: #333; padding: 20px; border-radius: 8px; }
+            #render-area { 
+                position: relative; width: 100%; height: 550px; background: var(--bg-wall); 
+                border: 2px solid #bdc3c7; overflow: hidden; border-radius: 5px; 
+            }
+            .label-tag { position: absolute; background: #e67e22; color: white; padding: 2px 8px; font-size: 11px; border-radius: 3px; z-index: 10; pointer-events: none; }
+            .component { position: absolute; cursor: pointer; z-index: 5; }
+            #lamp-img { width: 100px; transition: filter 0.3s; }
+            #poste { position: absolute; left: 0; top: 0; width: 200px; height: 100%; background: #ced6e0; border-right: 5px solid #747d8c; padding: 15px; box-sizing: border-box; }
+            .wire-source { width: 18px; height: 18px; border-radius: 50%; display: inline-block; margin-right: 8px; border: 2px solid #2f3542; vertical-align: middle; }
+            #quadro-distribuicao { position: absolute; left: 240px; top: 40px; width: 160px; height: 200px; background: #2f3542; border-radius: 8px; border: 5px solid #1e272e; color: white; text-align: center; padding: 10px; }
+            .breaker { width: 45px; height: 70px; background: #95a5a6; border: 3px solid #7f8c8d; margin: 15px auto; cursor: pointer; position: relative; }
+            .breaker-toggle { width: 100%; height: 50%; background: #333; position: absolute; bottom: 0; transition: transform 0.2s; }
+            .breaker.on .breaker-toggle { transform: translateY(-100%); background: #c0392b; }
+            #multimeter { 
+                position: absolute; width: 130px; height: 190px; background: #f1c40f; border: 4px solid #f39c12; border-radius: 12px; 
+                bottom: 20px; left: 240px; z-index: 100; cursor: move; padding: 12px; color: #000; text-align: center; box-shadow: 10px 10px 25px rgba(0,0,0,0.4);
+            }
+            #multi-display { background: #7f8c8d; height: 45px; border-radius: 5px; font-family: 'Courier New', monospace; font-size: 26px; line-height: 45px; margin-bottom: 12px; border: 3px inset #57606f; color: #000; font-weight: bold; }
+            .probe { position: absolute; width: 12px; height: 70px; border-radius: 6px; }
+            #probe-red { background: #ff4757; left: -25px; top: 60px; border: 2px solid #000; }
+            #probe-black { background: #2f3542; right: -25px; top: 60px; border: 2px solid #000; }
+            .controls { display: flex; justify-content: space-around; padding: 20px; background: #f1f2f6; border-radius: 8px; margin-top: 15px; flex-wrap: wrap; gap: 10px; }
+            .wire-btn { padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; color: white; }
+            .btn-fase { background: var(--fase); } .btn-neutro { background: var(--neutro); } .btn-terra { background: var(--protecao); } .btn-retorno { background: var(--retorno); }
+            #message-box { height: 70px; margin-top: 15px; padding: 15px; background: #fff; border-left: 8px solid #3498db; font-weight: 500; }
+            .hit-point { position: absolute; width: 22px; height: 22px; background: rgba(255, 255, 0, 0.4); border: 2px solid gold; border-radius: 50%; z-index: 20; cursor: crosshair; }
+            .short-circuit { animation: flash-red 0.15s infinite; background-color: rgba(255, 0, 0, 0.7) !important; }
+            @keyframes flash-red { 0% { opacity: 1; } 50% { opacity: 0.5; } 100% { opacity: 1; } }
+            svg { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; }
+            line { stroke-width: 6; stroke-linecap: round; }
+        </style>
+
+        <div class="sim-container">
+            <h2 style="margin:0; text-align: center;">Simulador de Instalação Elétrica Residencial Educativo</h2>
+            <p style="text-align: center; font-size: 14px; color: #7f8c8d;">Padrão NBR 5410 - Segurança e Identificação de Condutores</p>
+
+            <div id="render-area">
+                <svg id="wire-canvas"></svg>
+                <div class="label-tag" style="top: 20px; left: 630px;">Ponto de luz</div>
+                <div class="label-tag" style="top: 70px; left: 760px; background: #d35400;">Disco central</div>
+                <div class="label-tag" style="top: 150px; left: 760px; background: #d35400;">Base rosqueada</div>
+
+                <div id="poste">
+                    <h4 style="margin:0; font-size: 14px;">ENTRADA (REDE)</h4>
+                    <div style="margin-top:25px">
+                        <div onclick="selectWire('fase', document.querySelector('.btn-fase'))"><span class="wire-source btn-fase"></span> <strong>Fase</strong></div>
+                        <div style="margin-top:15px" onclick="selectWire('neutro', document.querySelector('.btn-neutro'))"><span class="wire-source btn-neutro"></span> <strong>Neutro</strong></div>
+                        <div style="margin-top:15px" onclick="selectWire('protecao', document.querySelector('.btn-terra'))"><span class="wire-source btn-terra"></span> <strong>Terra</strong></div>
+                    </div>
+                </div>
+
+                <div id="quadro-distribuicao" onclick="makeConnection('quadro')">
+                    <strong style="font-size: 12px;">QUADRO GERAL</strong>
+                    <div id="disjuntor-geral" class="breaker" onclick="toggleBreaker(event)">
+                        <div class="breaker-toggle"></div>
+                    </div>
+                    <div id="status-energia" style="font-size: 10px; font-weight: bold; color: #ff4757;">DISJUNTOR: OFF</div>
+                </div>
+
+                <div id="multimeter" onmousedown="startDrag(event)">
+                    <div id="multi-display">000</div>
+                    <div style="font-size: 11px; font-weight: bold;">VOLTÍMETRO AC</div>
+                    <div id="probe-red" class="probe"></div>
+                    <div id="probe-black" class="probe"></div>
+                </div>
+
+                <div class="hit-point" style="top: 40px; left: 185px;" onmouseover="measure('fase_bruta')" onmouseout="clearMeasure()"></div>
+                <div class="hit-point" style="top: 135px; left: 385px;" onmouseover="measure('fase_quadro')" onmouseout="clearMeasure()"></div>
+                <div class="hit-point" style="bottom: 100px; left: 745px;" onmouseover="measure('interruptor')" onmouseout="clearMeasure()"></div>
+                <div class="hit-point" style="top: 90px; left: 635px;" onmouseover="measure('lampada')" onmouseout="clearMeasure()"></div>
+
+                <div id="lampada-container" class="component" style="top: 60px; left: 600px;" onclick="makeConnection('lampada')">
+                    <img id="lamp-img" src="https://cdn-icons-png.flaticon.com/512/702/702797.png">
+                    <div style="font-size: 12px; font-weight: bold; text-align: center;">Ponto de Luz</div>
+                </div>
+
+                <div id="interruptor-box" class="component" style="bottom: 50px; left: 750px; width: 70px; height: 110px; border: 2px solid #ddd; border-radius: 4px;" onclick="makeConnection('interruptor')">
+                    <div id="switch-lever" class="switch-btn" style="width: 25px; height: 45px; background: #eee; margin: 30px auto;" onclick="event.stopPropagation(); toggleSwitch();"></div>
+                </div>
+            </div>
+
+            <div id="message-box">Bem-vindo! Passo 1: Conecte os fios do poste ao Quadro Geral.</div>
+
+            <div class="controls">
+                <button class="wire-btn btn-fase" onclick="selectWire('fase', this)">Ligar FASE</button>
+                <button class="wire-btn btn-neutro" onclick="selectWire('neutro', this)">Ligar NEUTRO</button>
+                <button class="wire-btn btn-terra" onclick="selectWire('protecao', this)">Ligar PROTEÇÃO</button>
+                <button class="wire-btn btn-retorno" onclick="selectWire('retorno', this)">Ligar RETORNO</button>
+                <button class="wire-btn" style="background: #34495e;" onclick="resetGame()">Reiniciar</button>
+            </div>
+
+            <div style="margin-top: 20px; font-size: 0.9em; background: #f9f9f9; padding: 15px; border-radius: 5px;">
+                <h3>Manual Técnico:</h3>
+                <ul>
+                    <li><strong>Fase:</strong> Deve ir <u>sempre</u> para o interruptor.</li>
+                    <li><strong>Neutro:</strong> Vai direto para a base rosqueada da lâmpada.</li>
+                    <li><strong>Retorno:</strong> Sai do interruptor para o disco central da lâmpada.</li>
+                    <li><strong>Terra:</strong> Ligado na carcaça metálica da luminária.</li>
+                </ul>
+            </div>
+        </div>
+    `,
+    pagina: "Aula 01 - Pág 5"
+},
+    
+    "instalacoes_eletricas_prediais_01_p6": {
         keywords: ["quadro de distribuição", "disjuntor", "circuitos", "DR", "DPS", "barramento"],
         fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
-        titulo: "Aula 1: O Quadro de Distribuição (Pág 5)",
+        titulo: "Aula 1: O Quadro de Distribuição (Pág 6)",
         icone: "🎛️",
         resumo: "O cérebro da instalação: organização de circuitos, proteção térmica e seccionamento.",
         html_content: `
