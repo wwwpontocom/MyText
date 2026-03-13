@@ -1,5 +1,5 @@
 // simulators.js - Logic for Architectural & Electrical Simulators
-// --- FIX IS HERE: Enhanced Socket Assembly with Switch Logic and Safety Checks ---
+// --- FIX IS HERE: Consolidated Logic with Enhanced Safety and Aula 2 Expansion ---
 
 window.SimulatorLogic = {
     // Lesson 01 - Page 2: Socket Assembly State
@@ -108,7 +108,7 @@ window.SimulatorLogic = {
         this.atualizarLampada();
     },
 
-    // Lesson 01 - Page 3: Breaker Panel (QDC) Logic
+    // Lesson 01 - Page 4: Breaker Panel (QDC) Logic
     simularCurto() {
         const d = document.getElementById('dj-luz');
         const status = document.getElementById('status-qdc');
@@ -126,6 +126,31 @@ window.SimulatorLogic = {
             d.style.transform = "rotate(0deg)";
             d.style.background = "#27ae60";
             status.innerHTML = "Status: Normal";
+        }
+    },
+
+    // Aula 02 Logic (Expansion)
+    aula2_switch: false,
+    toggleAula2() {
+        const lamp = document.getElementById('lamp-aula2');
+        const sw = document.getElementById('switch-visual-aula2');
+        const log = document.getElementById('log-aula2');
+        this.aula2_switch = !this.aula2_switch;
+        
+        if(this.aula2_switch) {
+            if(lamp) {
+                lamp.setAttribute('fill', '#f1c40f');
+                lamp.style.filter = "drop-shadow(0 0 10px #f1c40f)";
+            }
+            if(sw) sw.style.transform = "rotate(-10deg)";
+            if(log) log.innerHTML = "⚡ Circuito Fechado: Corrente fluindo pelo Retorno.";
+        } else {
+            if(lamp) {
+                lamp.setAttribute('fill', '#bbb');
+                lamp.style.filter = "none";
+            }
+            if(sw) sw.style.transform = "rotate(20deg)";
+            if(log) log.innerHTML = "⚪ Circuito Aberto: Interruptor seccionou a Fase.";
         }
     }
 };
