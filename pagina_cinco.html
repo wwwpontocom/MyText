@@ -63,9 +63,9 @@
             <div style="font-size: 12px; font-weight: bold; color: #2c3e50;">Ponto de Luz</div>
         </div>
 
-        <div id="interruptor-box" onclick="makeConnection('interruptor')" style="position: absolute; cursor: pointer; z-index: 5; bottom: 50px; left: 750px; width: 70px; height: 110px; background: #fdfdfd; border: 2px solid #ddd; border-radius: 4px; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);">
-            <div id="switch-lever" style="width: 25px; height: 45px; background: #eee; border: 1px solid #bbb; margin: 30px auto; cursor: pointer; transition: transform 0.2s;"></div>
-        </div>
+       <div id="interruptor-box" onclick="makeConnection('interruptor')" style="position: absolute; cursor: pointer; z-index: 5; bottom: 50px; left: 750px; width: 70px; height: 110px; background: #fdfdfd; border: 2px solid #ddd; border-radius: 4px; box-shadow: inset 0 0 10px rgba(0,0,0,0.1);">
+    <div id="switch-lever" onclick="event.stopPropagation(); toggleSwitch();" style="width: 25px; height: 45px; background: #eee; border: 1px solid #bbb; margin: 30px auto; cursor: pointer; transition: transform 0.2s; border-radius: 2px;"></div>
+</div>
     </div>
 
     <div id="message-box" style="height: 70px; margin-top: 15px; padding: 15px; background: #fff; border-left: 8px solid #3498db; font-weight: 500; font-size: 15px; color: #333;">
@@ -120,28 +120,7 @@
         msgBox.innerHTML = `Fio <strong>${type.toUpperCase()}</strong> selecionado. Clique no destino para conectar.`;
     }
 
-    function toggleBreaker(e) {
-        e.stopPropagation();
-        if (!connections.posteToQuadro.fase) {
-            msgBox.innerHTML = "❌ <span style='color:red'>ERRO:</span> Não há energia chegando do poste ao quadro!";
-            return;
-        }
-        breakerOn = !breakerOn;
-        const b = document.getElementById('disjuntor-geral');
-        const s = document.getElementById('status-energia');
-        if (breakerOn) {
-            b.classList.add('on');
-            s.innerText = "DISJUNTOR: ON";
-            s.style.color = "#2ecc71";
-            msgBox.innerHTML = "⚡ <strong>Energia armada!</strong> Use o multímetro para testar os pontos de luz.";
-            checkVictory();
-        } else {
-            b.classList.remove('on');
-            s.innerText = "DISJUNTOR: OFF";
-            s.style.color = "#ff4757";
-            document.getElementById('lamp-img').style.filter = "none";
-        }
-    }
+   
 
     function drawLine(x1, y1, x2, y2, color) {
         const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
@@ -209,12 +188,37 @@
 function triggerShortCircuit() {
     msgBox.innerHTML = "<strong style='color:red;'>💥 ERRO DE CONEXÃO!</strong> Isso causaria um curto-circuito ou choque!";
     const area = document.getElementById('render-area');
-    area.classList.add('short-circuit');
+    area.classList.add('short-circuit-active'); // Changed from 'short-circuit' to 'short-circuit-active'
     
     setTimeout(() => {
-        area.classList.remove('short-circuit');
-        // Optional: Reset logic here if you want them to start over after a shock
+        area.classList.remove('short-circuit-active');
     }, 1000);
+}
+
+// Ensure the breaker logic also updates the visual state correctly
+function toggleBreaker(e) {
+    e.stopPropagation();
+    if (!connections.posteToQuadro.fase) {
+        msgBox.innerHTML = "❌ <span style='color:red'>ERRO:</span> Não há energia chegando do poste ao quadro!";
+        return;
+    }
+    breakerOn = !breakerOn;
+    const b = document.getElementById('disjuntor-geral');
+    const s = document.getElementById('status-energia');
+    const toggle = b.querySelector('.breaker-toggle'); // Locate the inner toggle
+
+    if (breakerOn) {
+        toggle.style.transform = "translateY(-30px)"; // Visual "ON" position
+        s.innerText = "DISJUNTOR: ON";
+        s.style.color = "#2ecc71";
+        msgBox.innerHTML = "⚡ <strong>Energia armada!</strong> Ligue o interruptor.";
+        checkVictory();
+    } else {
+        toggle.style.transform = "translateY(0)"; // Visual "OFF" position
+        s.innerText = "DISJUNTOR: OFF";
+        s.style.color = "#ff4757";
+        document.getElementById('lamp-img').style.filter = "none";
+    }
 }
 
     
