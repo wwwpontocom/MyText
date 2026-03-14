@@ -13,13 +13,12 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
                     Você entrará em um ambiente 2D interativo para montar o quadro geral e realizar medições com multímetro.
                 </p>
                 
-                <button 
-                    onclick="loadSimulatorPage('instalacoes_eletricas_prediais_01_p5')" 
-                    style="padding: 15px 40px; font-size: 18px; font-weight: bold; color: white; background: #3498db; border: none; border-radius: 50px; cursor: pointer; transition: 0.3s; box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);"
-                    onmouseover="this.style.background='#2980b9'; this.style.transform='scale(1.05)'"
-                    onmouseout="this.style.background='#3498db'; this.style.transform='scale(1)'">
-                    🚀 INICIAR SIMULADOR
+                <div style="text-align:center; padding:20px;">
+                <button onclick="window.loadSimulatorPage('instalacoes_eletricas_prediais_01_p5')" 
+                        style="padding:15px 30px; cursor:pointer; background:#3498db; color:white; border:none; border-radius:5px;">
+                    Abrir Simulador da Página 5
                 </button>
+            </div>
             </div>
         `,
         pagina: "Aula 01 - Launcher"
