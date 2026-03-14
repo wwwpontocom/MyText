@@ -70,6 +70,11 @@
     <div id="typing-display" class="display-box" style="background: #f9f9f9; min-height: 60px;"></div>
 </div>
 
+    <button onclick="debugSimulatorLoad()" style="position: fixed; bottom: 20px; right: 20px; z-index: 9999; padding: 10px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer; font-family: sans-serif;">
+    🛠️ Testar Carregamento P5
+</button>
+
+
 <script>
     // --- INTERNAL VOICE DICTATION LOGIC ---
     const startBtn = document.getElementById('start-btn');
@@ -206,6 +211,40 @@
         // Manually trigger the highlighting logic for the external editor
         if (window.onInputUpdate) window.onInputUpdate(); 
     };
+
+function debugSimulatorLoad() {
+    console.log("--- INICIANDO DEBUG ---");
+    
+    // 1. Verificar se a biblioteca existe
+    if (typeof BIBLIOTECA_CONVERSAS === 'undefined') {
+        alert("ERRO: BIBLIOTECA_CONVERSAS não foi encontrada! Verifique se o script data_conversations_dois.js está carregado no index.");
+        return;
+    }
+
+    // 2. Verificar a chave específica
+    const chave = "instalacoes_eletricas_prediais_01_p5";
+    const data = BIBLIOTECA_CONVERSAS[chave];
+
+    if (!data) {
+        alert("ERRO: A chave '" + chave + "' não existe na BIBLIOTECA_CONVERSAS. Verifique o nome no arquivo JS.");
+        console.log("Chaves disponíveis:", Object.keys(BIBLIOTECA_CONVERSAS));
+    } else {
+        // 3. Verificar o conteúdo
+        if (data.html_content && data.html_content.trim().length > 0) {
+            console.log("Sucesso! Conteúdo encontrado. Tamanho:", data.html_content.length, "caracteres.");
+            
+            // Tentar forçar o carregamento
+            if (window.loadSimulatorPage) {
+                alert("Conteúdo OK! Tentando carregar via loadSimulatorPage...");
+                window.loadSimulatorPage(chave);
+            } else {
+                alert("Conteúdo encontrado, mas a função window.loadSimulatorPage não está definida no main.js.");
+            }
+        } else {
+            alert("ERRO: A chave existe, mas o 'html_content' está vazio ou mal formado.");
+        }
+    }
+}
 </script>
 </body>
 </html>
