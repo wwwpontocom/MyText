@@ -223,3 +223,62 @@ window.SimulatorLogic = {
         }
     }
 };
+
+
+// --- PAGE 7: FUNDAMENTALS LOGIC ---
+    electrons: [],
+    
+    initFundamentals() {
+        const group = document.getElementById('electron-group');
+        if (!group) return;
+        group.innerHTML = "";
+        this.electrons = [];
+        for (let i = 0; i < 40; i++) {
+            const circle = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
+            circle.setAttribute('r', '3');
+            circle.setAttribute('fill', '#f1c40f');
+            group.appendChild(circle);
+            this.electrons.push({
+                el: circle,
+                x: Math.random() * 280 + 10,
+                y: Math.random() * 20 + 65
+            });
+        }
+        this.animateElectrons();
+    },
+
+    updateFundamentals() {
+        const v = document.getElementById('range-v').value;
+        const a = document.getElementById('range-a').value;
+        const p = v * a;
+
+        document.getElementById('val-v').innerText = v;
+        document.getElementById('val-a').innerText = a;
+        document.getElementById('power-result').innerHTML = `Potência: <strong>${p}W</strong>`;
+        
+        // Visual feedback: Power brightness
+        const resultBox = document.getElementById('power-result');
+        const intensity = Math.min(p / 6600, 1); // Max 6600W for scale
+        resultBox.style.background = `rgba(241, 196, 15, ${intensity})`;
+    },
+
+    animateElectrons() {
+        const v = document.getElementById('range-v')?.value || 0;
+        const a = document.getElementById('range-a')?.value || 0;
+        
+        this.electrons.forEach((e, index) => {
+            // Speed depends on Voltage (V)
+            // Number of visible electrons active depends on Current (A)
+            if (index < a * 1.3) { 
+                e.el.style.display = "block";
+                e.x += (v / 20); 
+                if (e.x > 290) e.x = 10;
+            } else {
+                e.el.style.display = "none";
+            }
+            e.el.setAttribute('cx', e.x);
+            e.el.setAttribute('cy', e.y);
+        });
+
+        requestAnimationFrame(() => this.animateElectrons());
+    }
