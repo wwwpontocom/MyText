@@ -213,37 +213,45 @@
     };
 
 
-    // Function to bridge the HTML file into your AI Library
+   // --- FIX IS HERE ---
+// Updated to handle multiple pages (5 and 7)
 async function bridgeHtmlToLibrary() {
-    try {
-        // 1. Fetch the raw HTML file from your GitHub/Server
-        const response = await fetch('pagina_cinco.html');
-        const htmlText = await response.text();
+    const pagesToLoad = [
+        { file: 'pagina_cinco.html', key: 'instalacoes_eletricas_prediais_01_p5', title: 'Aula 1: Simulador de Instalação Residencial (Pág 5)' },
+        { file: 'pagina_sete.html', key: 'pagina_sete', title: 'Aula 1: Simulador de Grandezas (Pág 7)' }
+    ];
 
-        // 2. Clean the HTML (Optional: Remove <html>/<body> tags to keep it as a partial)
-        const parser = new DOMParser();
-        const doc = parser.parseFromString(htmlText, 'text/html');
-        const cleanContent = doc.body.innerHTML;
+    for (const page of pagesToLoad) {
+        try {
+            const response = await fetch(page.file);
+            const htmlText = await response.text();
 
-        // 3. Insert it into the BIBLIOTECA_CONVERSAS object
-        BIBLIOTECA_CONVERSAS["instalacoes_eletricas_prediais_01_p5"] = {
-            keywords: ["simulador", "NBR 5410", "quadro", "multímetro", "instalação"],
-            fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
-            titulo: "Aula 1: Simulador de Instalação Residencial (Pág 5)",
-            icone: "bolt",
-            resumo: "Laboratório avançado carregado de arquivo externo.",
-            html_content: cleanContent, // The code from your file is now here!
-            pagina: "Aula 01 - Pág 5"
-        };
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(htmlText, 'text/html');
+            
+            // Extract body content + any internal style/script tags
+            const cleanContent = doc.head.innerHTML + doc.body.innerHTML;
 
-        console.log("✅ Página 5 carregada com sucesso do arquivo HTML!");
-    } catch (error) {
-        console.error("❌ Erro ao carregar pagina_cinco.html:", error);
+            BIBLIOTECA_CONVERSAS[page.key] = {
+                keywords: ["eletricidade", "simulador", "NBR 5410", "grandezas"],
+                fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+                titulo: page.title,
+                icone: "bolt",
+                resumo: "Laboratório carregado dinamicamente do arquivo externo.",
+                html_content: cleanContent,
+                pagina: page.title.split(': ')[1] // Extracts "Pág 5" or "Pág 7"
+            };
+
+            console.log(`✅ ${page.file} carregada com sucesso!`);
+        } catch (error) {
+            console.error(`❌ Erro ao carregar ${page.file}:`, error);
+        }
     }
 }
 
 // Run the bridge when the app starts
 bridgeHtmlToLibrary();
+// --- END OF FIX ---
     
 function checkInternalLibrary() {
     if (BIBLIOTECA_CONVERSAS["instalacoes_eletricas_prediais_01_p5"]) {
