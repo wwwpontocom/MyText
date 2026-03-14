@@ -76,6 +76,37 @@
         </div>
     </div>
 </div>
+    <div class="explanation-content" style="margin-top: 30px; border-top: 2px solid #3498db; padding-top: 20px; color: #2c3e50;">
+        <p>No simulador, você deve ter percebido um conflito: para atingir a potência necessária para o chuveiro, a lâmpada acaba "explodindo".</p>
+        
+        <p>Aqui está a explicação física e como resolvemos isso na vida real:</p>
+        
+        <h3 style="color: #2980b9;">1. O Problema da Potência Única ($P = V \times A$)</h3>
+        <p>No simulador atual, os dois aparelhos estão recebendo a mesma Corrente (A) e a mesma Tensão (V) ao mesmo tempo.</p>
+        <ul>
+            <li><strong>A Lâmpada</strong> é um componente delicado. Ela precisa de pouca corrente para brilhar. Se você injetar a corrente necessária para um chuveiro (40A a 50A) em uma lâmpada comum, o filamento dela não suporta o calor e derrete instantaneamente (o efeito Joule).</li>
+            <li><strong>O Chuveiro</strong> é um componente robusto. Ele precisa de uma "enxurrada" de elétrons para aquecer a água. Se você der a ele apenas a corrente de uma lâmpada (~0,5A), ele nem sequer morna a água.</li>
+        </ul>
+
+        <h3 style="color: #2980b9;">2. Como resolvemos isso na Arquitetura? (Circuitos Independentes)</h3>
+        <p>Na prática, nunca ligamos um chuveiro e uma lâmpada no mesmo "fio" (circuito) em série. Seguindo a norma <strong>NBR 5410</strong>, dividimos a casa em Circuitos Terminais:</p>
+        <ul>
+            <li><strong>Circuito de Iluminação:</strong> Tem cabos mais finos (1,5 mm²) e disjuntores de baixa amperagem (ex: 10A). Ele limita a corrente para proteger as lâmpadas.</li>
+            <li><strong>Circuito do Chuveiro:</strong> É um circuito exclusivo (TUG/TUE). Usa cabos muito mais grossos (4 mm² ou 6 mm²) e disjuntores de alta amperagem (ex: 40A ou 50A).</li>
+        </ul>
+
+        <h3 style="color: #2980b9;">3. Tensão (V) vs. Corrente (A)</h3>
+        <p>Se você quer que o chuveiro funcione com "menos esforço" (menos corrente), a solução arquitetônica é mudar a Tensão:</p>
+        <ul>
+            <li><strong>Em 127V:</strong> para o chuveiro chegar a 5500W, ele precisa de aproximadamente 43A. Isso exige fios muito grossos.</li>
+            <li><strong>Em 220V:</strong> para a mesma potência, ele precisa de apenas 25A. Isso permite usar fios um pouco mais finos e sobrecarrega menos a rede.</li>
+        </ul>
+
+        <div style="background: #f1f2f6; padding: 15px; border-left: 5px solid #3498db; border-radius: 5px; margin-top: 20px;">
+            <strong>Resumo para o seu aprendizado:</strong><br>
+            No seu simulador, a lâmpada explode porque ela está sendo forçada a aguentar a "pressão e volume" que só um chuveiro aguenta. Na vida real, o Disjuntor do circuito de iluminação desarmaria antes da lâmpada explodir, protegendo o sistema.
+        </div>
+    </div>
 
 <style>
     /* Essential animations that must remain in a style block */
