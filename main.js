@@ -219,3 +219,26 @@ function loadTemplate() {
 }
 
 document.addEventListener('DOMContentLoaded', updateTemplateDropdown);
+
+
+function loadSimulatorPage(key) {
+    const target = BIBLIOTECA_CONVERSAS[key];
+    if (!target) return console.error("Página não encontrada!");
+
+    // 1. Get the main display area of your app
+    const mainArea = document.getElementById('content-display'); // Adjust ID as needed
+
+    // 2. Inject HTML
+    mainArea.innerHTML = target.html_content;
+
+    // 3. Force Scripts to Execute
+    const scripts = mainArea.querySelectorAll("script");
+    scripts.forEach(oldScript => {
+        const newScript = document.createElement("script");
+        newScript.text = oldScript.text;
+        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+    });
+
+    // 4. Scroll to top so the user sees the start of the game
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+}
