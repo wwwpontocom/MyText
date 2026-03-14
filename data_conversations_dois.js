@@ -1,12 +1,12 @@
 Object.assign(BIBLIOTECA_CONVERSAS, {
     "instalacoes_eletricas_prediais_01_p5": {
-    keywords: ["simulador", "NBR 5410", "quadro", "multímetro", "instalação"],
-    fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
-    titulo: "Aula 1: Simulador de Instalação Residencial (Pág 5)",
-    icone: "bolt",
-    resumo: "Laboratório avançado com Quadro de Distribuição, Multímetro funcional e teste de carga.",
-    html_content: `
-         <style>
+        keywords: ["simulador", "NBR 5410", "quadro", "multímetro", "instalação"],
+        fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+        titulo: "Aula 1: Simulador de Instalação Residencial (Pág 5)",
+        icone: "bolt",
+        resumo: "Laboratório avançado com Quadro de Distribuição, Multímetro funcional e teste de carga.",
+        html_content: `
+            <style>
         :root {
             --fase: #ff0000;
             --neutro: #0000ff;
