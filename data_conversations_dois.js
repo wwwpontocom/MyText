@@ -182,6 +182,7 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
     const msgBox = document.getElementById('message-box');
     const display = document.getElementById('multi-display');
 
+
     function selectWire(type, btn) {
         selectedWireType = type;
         document.querySelectorAll('.wire-btn').forEach(b => b.classList.remove('selected'));
@@ -361,8 +362,7 @@ function checkVictory() {
 
 </script>
 
-    `,
-    pagina: "Aula 01 - Pág 5"
-      
+  `, // <-- FECHAMENTO DA CRASE AQUI
+        pagina: "Aula 01 - Pág 5"
     }
 });
