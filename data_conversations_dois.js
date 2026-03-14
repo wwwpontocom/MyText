@@ -48,5 +48,30 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
         </div>
     `,
     pagina: "Aula 01 - Pág 07"
-  }
+},
+
+// --- NEW PAGE 8 LAUNCHER ---
+    "padrao_entrada_p8_launcher": {
+        keywords: ["padrão de entrada", "concessionária", "poste", "consumidor", "responsabilidade"],
+        fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+        titulo: "Módulo: Padrão de Entrada e Responsabilidades",
+        icone: "house",
+        resumo: "Estude os componentes do padrão de entrada e identifique o que é responsabilidade do consumidor.",
+        html_content: `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; background: #fffdf9; border-radius: 15px; border: 2px dashed #f39c12; text-align: center;">
+                <div style="font-size: 50px; margin-bottom: 20px;">🏠</div>
+                <h3 style="color: #2c3e50; margin-bottom: 10px;">Infraestrutura de Entrada</h3>
+                <p style="color: #7f8c8d; max-width: 400px; margin-bottom: 25px;">
+                    Explore o ramal de ligação, poste particular e quadro de medição em um diagrama interativo.
+                </p>
+                <div style="text-align:center; padding:20px;">
+                    <button onclick="window.loadSimulatorPage('pagina_oito')" 
+                            style="padding:15px 30px; cursor:pointer; background:#f39c12; color:white; border:none; border-radius:5px; font-weight:bold; transition: 0.3s;">
+                        Abrir Padrão de Entrada (Pág 8)
+                    </button>
+                </div>
+            </div>
+        `,
+        pagina: "Aula 01 - Pág 08"
+    }
 });
