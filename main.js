@@ -221,24 +221,33 @@ function loadTemplate() {
 document.addEventListener('DOMContentLoaded', updateTemplateDropdown);
 
 
-function loadSimulatorPage(key) {
-    const target = BIBLIOTECA_CONVERSAS[key];
-    if (!target) return console.error("Página não encontrada!");
+window.loadSimulatorPage = function(key) {
+    const data = BIBLIOTECA_CONVERSAS[key];
+    if (!data) {
+        console.error("Chave não encontrada:", key);
+        return;
+    }
 
-    // 1. Get the main display area of your app
-    const mainArea = document.getElementById('content-display'); // Adjust ID as needed
+    // 1. Identifique onde o conteúdo deve aparecer (ajuste o ID conforme seu index.html)
+    const container = document.getElementById('main-content') || document.body;
 
-    // 2. Inject HTML
-    mainArea.innerHTML = target.html_content;
+    // 2. Injeta o HTML
+    container.innerHTML = data.html_content;
 
-    // 3. Force Scripts to Execute
-    const scripts = mainArea.querySelectorAll("script");
+    // 3. FIX CRÍTICO: Executa os scripts manualmente
+    const scripts = container.querySelectorAll("script");
     scripts.forEach(oldScript => {
         const newScript = document.createElement("script");
-        newScript.text = oldScript.text;
-        document.body.appendChild(newScript).parentNode.removeChild(newScript);
+        // Copia o conteúdo do script
+        if (oldScript.src) {
+            newScript.src = oldScript.src;
+        } else {
+            newScript.textContent = oldScript.textContent;
+        }
+        // Adiciona ao documento para execução e remove em seguida
+        document.body.appendChild(newScript);
+        document.body.removeChild(newScript);
     });
 
-    // 4. Scroll to top so the user sees the start of the game
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-}
+    console.log("Simulador carregado:", key);
+};
