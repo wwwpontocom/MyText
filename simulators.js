@@ -108,7 +108,7 @@ window.SimulatorLogic = {
         this.atualizarLampada();
     },
 
-    // Lesson 01 - Page 5: Breaker Panel (QDC) Logic
+    // Lesson 01 - Page 6: Breaker Panel (QDC) Logic
     simularCurto() {
         const d = document.getElementById('dj-luz');
         const status = document.getElementById('status-qdc');
