@@ -215,41 +215,47 @@
 
    // --- FIX IS HERE ---
 // Updated to handle multiple pages (5 and 7)
+// Function to bridge multiple HTML files into your AI Library
 async function bridgeHtmlToLibrary() {
-    const pagesToLoad = [
-        { file: 'pagina_cinco.html', key: 'instalacoes_eletricas_prediais_01_p5', title: 'Aula 1: Simulador de Instalação Residencial (Pág 5)' },
-        { file: 'pagina_sete.html', key: 'pagina_sete', title: 'Aula 1: Simulador de Grandezas (Pág 7)' }
+    // List all pages you want to load here
+    const pages = [
+        { file: 'pagina_cinco.html', key: 'instalacoes_eletricas_prediais_01_p5', title: 'Simulador: Instalação Residencial' },
+        { file: 'pagina_sete.html', key: 'pagina_sete', title: 'Simulador: Grandezas Elétricas' },
+// --- FIX IS HERE ---
+        { file: 'pagina_oito.html', key: 'pagina_oito', title: 'Simulador: Padrão de Entrada' }
+// --- END OF FIX ---
     ];
 
-    for (const page of pagesToLoad) {
+    for (const page of pages) {
         try {
             const response = await fetch(page.file);
+            if (!response.ok) throw new Error(`Status: ${response.status}`);
+            
             const htmlText = await response.text();
-
             const parser = new DOMParser();
             const doc = parser.parseFromString(htmlText, 'text/html');
-            
-            // Extract body content + any internal style/script tags
-            const cleanContent = doc.head.innerHTML + doc.body.innerHTML;
+
+            // IMPORTANT: Capture styles from <head> and content from <body>
+            const fullInlineContent = doc.head.innerHTML + doc.body.innerHTML;
 
             BIBLIOTECA_CONVERSAS[page.key] = {
-                keywords: ["eletricidade", "simulador", "NBR 5410", "grandezas"],
+                keywords: ["eletricidade", "arquitetura", "simulador", "NBR 5410"],
                 fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
                 titulo: page.title,
                 icone: "bolt",
-                resumo: "Laboratório carregado dinamicamente do arquivo externo.",
-                html_content: cleanContent,
-                pagina: page.title.split(': ')[1] // Extracts "Pág 5" or "Pág 7"
+                resumo: `Módulo interativo carregado de ${page.file}.`,
+                html_content: fullInlineContent,
+                pagina: page.file.replace('.html', '').replace('_', ' ')
             };
 
-            console.log(`✅ ${page.file} carregada com sucesso!`);
+            console.log(`✅ ${page.file} mapped to BIBLIOTECA_CONVERSAS["${page.key}"]`);
         } catch (error) {
-            console.error(`❌ Erro ao carregar ${page.file}:`, error);
+            console.error(`❌ Failure loading ${page.file}:`, error);
         }
     }
 }
 
-// Run the bridge when the app starts
+// Initialize the library bridge
 bridgeHtmlToLibrary();
 // --- END OF FIX ---
     
