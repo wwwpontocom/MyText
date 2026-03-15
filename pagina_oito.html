@@ -27,7 +27,10 @@
         <div id="part-caixa" class="comp" style="position: absolute; bottom: 80px; left: 33%; width: 50px; height: 60px; background: #95a5a6; border: 3px solid #7f8c8d; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px;" onclick="showInfo('Quadro de Medição', 'Local onde se instala o medidor da concessionária e os dispositivos de proteção geral (disjuntor).')">kWh</div>
 
         <div id="part-aterramento" class="comp" style="position: absolute; bottom: 0; left: 38%; width: 4px; height: 80px; background: #27ae60; cursor: pointer;" onclick="showInfo('Aterramento', 'Hastes de cobre e condutores que garantem a segurança contra choques e sobretensões.')"></div>
-        <div style="position: absolute; bottom: 0; width: 100%; height: 10px; background: #2ecc71;"></div> <div style="position: absolute; bottom: 10px; right: 20px; width: 200px; height: 150px; border: 4px solid #3498db; border-bottom: none; border-radius: 5px 5px 0 0; background: rgba(52, 152, 219, 0.1);">
+        
+        <div style="position: absolute; bottom: 0; width: 100%; height: 10px; background: #2ecc71;"></div> 
+        
+        <div style="position: absolute; bottom: 10px; right: 20px; width: 200px; height: 150px; border: 4px solid #3498db; border-bottom: none; border-radius: 5px 5px 0 0; background: rgba(52, 152, 219, 0.1);">
              <div style="text-align: center; margin-top: 20px; color: #3498db; font-weight: bold;">EDIFICAÇÃO</div>
         </div>
     </div>
@@ -55,6 +58,20 @@
             </ul>
         </div>
     </div>
+
+    <div style="margin-top: 30px; padding: 20px; background: #fdfdfd; border: 1px solid #eee; border-radius: 10px;">
+        <h3 style="margin-top: 0; font-size: 1.1em; color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 10px;">Checklist de Estudo: Componentes do Padrão</h3>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Ramal de Ligação</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Poste ou Pontalete</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Caixas de Passagem</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Dispositivos de Proteção</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Sistema de Aterramento</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Ferragens e Eletrodutos</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Quadro de Medição (kWh)</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Responsabilidade Técnica</label>
+        </div>
+    </div>
 </div>
 
 <style>
@@ -62,6 +79,7 @@
     .comp:hover { transform: scale(1.1); filter: brightness(1.2); outline: 2px solid #f1c40f; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0px rgba(241, 196, 15, 0.7); } 100% { box-shadow: 0 0 0 10px rgba(241, 196, 15, 0); } }
     .comp { animation: pulse 2s infinite; }
+    input[type="checkbox"] { accent-color: #f39c12; width: 18px; height: 18px; }
 </style>
 
 <script>
@@ -73,7 +91,6 @@
         titleEl.innerText = title;
         descEl.innerText = desc;
         
-        // Brief highlight effect
         panel.style.backgroundColor = "#fff9c4";
         setTimeout(() => {
             panel.style.backgroundColor = "#f8f9fa";
