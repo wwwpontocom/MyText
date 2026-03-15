@@ -20,13 +20,15 @@
         <div style="position: absolute; top: 50px; left: 0; width: 40%; height: 4px; background: #7f8c8d; z-index: 1;"></div>
         <div style="position: absolute; top: 30px; left: 10px; color: #7f8c8d; font-size: 10px; font-weight: bold;">REDE DA CONCESSIONÁRIA</div>
 
-        <div id="part-ramal" class="comp" style="position: absolute; top: 40px; left: 40%; width: 20px; height: 20px; background: #e74c3c; border-radius: 50%; cursor: pointer; z-index: 2;" onclick="showInfo('Ramal de Ligação', 'Ponto de conexão entre a rede da concessionária e a instalação do consumidor.')"></div>
+        <div id="part-ramal" class="comp" style="position: absolute; top: 40px; left: 40%; width: 20px; height: 20px; background: #e74c3c; border-radius: 50%; cursor: pointer; z-index: 2;" onclick="showInfo('Ramal de Ligação', 'Ponto de conexão entre a rede da concessionária e a instalação do consumidor.', 'chk-ramal')"></div>
 
-        <div id="part-poste" class="comp" style="position: absolute; top: 50px; left: 40%; width: 12px; height: 260px; background: #34495e; cursor: pointer;" onclick="showInfo('Poste Particular / Pontalete', 'Suporte mecânico para ancoragem dos cabos de entrada, dimensionado conforme a carga.')"></div>
+        <div id="part-poste" class="comp" style="position: absolute; top: 50px; left: 40%; width: 12px; height: 260px; background: #34495e; cursor: pointer;" onclick="showInfo('Poste Particular / Pontalete', 'Suporte mecânico para ancoragem dos cabos.', 'chk-poste')"></div>
+        <div id="part-ferragem" class="comp" style="position: absolute; top: 60px; left: 38%; width: 20px; height: 5px; background: #95a5a6; cursor: pointer;" onclick="showInfo('Ferragens', 'Armação secundária, roldanas e parafusos de fixação.', 'chk-ferragem')"></div>
 
-        <div id="part-caixa" class="comp" style="position: absolute; bottom: 80px; left: 33%; width: 50px; height: 60px; background: #95a5a6; border: 3px solid #7f8c8d; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px;" onclick="showInfo('Quadro de Medição', 'Local onde se instala o medidor da concessionária e os dispositivos de proteção geral (disjuntor).')">kWh</div>
+        <div id="part-caixa" class="comp" style="position: absolute; bottom: 80px; left: 33%; width: 50px; height: 60px; background: #95a5a6; border: 3px solid #7f8c8d; cursor: pointer; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 10px;" onclick="showInfo('Quadro de Medição / Caixas', 'Local do medidor e caixas de passagem.', 'chk-caixa')">kWh</div>
+        <div id="part-protecao" class="comp" style="position: absolute; bottom: 85px; left: 34%; width: 15px; height: 10px; background: #f1c40f; border: 1px solid #333; cursor: pointer;" onclick="showInfo('Proteção', 'Disjuntor termomagnético geral da entrada.', 'chk-protecao')"></div>
 
-        <div id="part-aterramento" class="comp" style="position: absolute; bottom: 0; left: 38%; width: 4px; height: 80px; background: #27ae60; cursor: pointer;" onclick="showInfo('Aterramento', 'Hastes de cobre e condutores que garantem a segurança contra choques e sobretensões.')"></div>
+        <div id="part-aterramento" class="comp" style="position: absolute; bottom: 0; left: 38%; width: 4px; height: 80px; background: #27ae60; cursor: pointer;" onclick="showInfo('Aterramento', 'Hastes de cobre e condutores de segurança.', 'chk-terra')"></div>
         
         <div style="position: absolute; bottom: 0; width: 100%; height: 10px; background: #2ecc71;"></div> 
         
@@ -37,53 +39,32 @@
 
     <div id="info-panel" style="background: #f8f9fa; padding: 15px; border-radius: 8px; border: 1px solid #dee2e6; min-height: 80px; text-align: center;">
         <p id="info-title" style="margin: 0; color: #2c3e50; font-weight: bold; font-size: 1.1em;">Selecione um componente no diagrama</p>
-        <p id="info-desc" style="margin: 5px 0 0; color: #636e72; font-size: 0.9em;">Clique nos itens destacados para identificar as responsabilidades do consumidor.</p>
-    </div>
-
-    <div style="margin-top: 20px; display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-        <div style="background: #e9ecef; padding: 10px; border-radius: 5px;">
-            <strong style="color: #e67e22;">Itens de Ferragem:</strong>
-            <ul style="font-size: 0.85em; padding-left: 20px; margin-top: 5px;">
-                <li>Armação secundária</li>
-                <li>Roldanas e parafusos</li>
-                <li>Curvas e eletrodutos</li>
-            </ul>
-        </div>
-        <div style="background: #e9ecef; padding: 10px; border-radius: 5px;">
-            <strong style="color: #27ae60;">Proteção:</strong>
-            <ul style="font-size: 0.85em; padding-left: 20px; margin-top: 5px;">
-                <li>Disjuntor Termomagnético</li>
-                <li>Caixa de Inspeção de Terra</li>
-                <li>Conectores de pressão</li>
-            </ul>
-        </div>
+        <p id="info-desc" style="margin: 5px 0 0; color: #636e72; font-size: 0.9em;">Clique nos itens destacados para preencher o checklist.</p>
     </div>
 
     <div style="margin-top: 30px; padding: 20px; background: #fdfdfd; border: 1px solid #eee; border-radius: 10px;">
         <h3 style="margin-top: 0; font-size: 1.1em; color: #2c3e50; border-bottom: 1px solid #eee; padding-bottom: 10px;">Checklist de Estudo: Componentes do Padrão</h3>
         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 15px;">
-            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Ramal de Ligação</label>
-            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Poste ou Pontalete</label>
-            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Caixas de Passagem</label>
-            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Dispositivos de Proteção</label>
-            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Sistema de Aterramento</label>
-            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Ferragens e Eletrodutos</label>
-            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Quadro de Medição (kWh)</label>
-            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" style="margin-right: 10px;"> Responsabilidade Técnica</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" id="chk-ramal" style="margin-right: 10px;"> Ramal de Ligação</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" id="chk-poste" style="margin-right: 10px;"> Poste ou Pontalete</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" id="chk-caixa" style="margin-right: 10px;"> Caixas de Passagem / Medição</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" id="chk-protecao" style="margin-right: 10px;"> Dispositivos de Proteção</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" id="chk-terra" style="margin-right: 10px;"> Sistema de Aterramento</label>
+            <label style="display: flex; align-items: center; font-size: 0.9em; cursor: pointer;"><input type="checkbox" id="chk-ferragem" style="margin-right: 10px;"> Ferragens e Eletrodutos</label>
         </div>
     </div>
 </div>
 
 <style>
     .comp { transition: transform 0.2s, filter 0.2s; }
-    .comp:hover { transform: scale(1.1); filter: brightness(1.2); outline: 2px solid #f1c40f; }
+    .comp:hover { transform: scale(1.2); filter: brightness(1.2); outline: 2px solid #f1c40f; }
     @keyframes pulse { 0% { box-shadow: 0 0 0 0px rgba(241, 196, 15, 0.7); } 100% { box-shadow: 0 0 0 10px rgba(241, 196, 15, 0); } }
     .comp { animation: pulse 2s infinite; }
-    input[type="checkbox"] { accent-color: #f39c12; width: 18px; height: 18px; }
+    input[type="checkbox"] { accent-color: #27ae60; width: 20px; height: 20px; }
 </style>
 
 <script>
-    function showInfo(title, desc) {
+    function showInfo(title, desc, checkId) {
         const titleEl = document.getElementById('info-title');
         const descEl = document.getElementById('info-desc');
         const panel = document.getElementById('info-panel');
@@ -91,10 +72,15 @@
         titleEl.innerText = title;
         descEl.innerText = desc;
         
-        panel.style.backgroundColor = "#fff9c4";
+        // Auto-check the item
+        if(checkId) {
+            document.getElementById(checkId).checked = true;
+        }
+        
+        panel.style.backgroundColor = "#d5f5e3";
         setTimeout(() => {
             panel.style.backgroundColor = "#f8f9fa";
-        }, 300);
+        }, 400);
     }
 </script>
 
