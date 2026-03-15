@@ -73,5 +73,29 @@ Object.assign(BIBLIOTECA_CONVERSAS, {
             </div>
         `,
         pagina: "Aula 01 - Pág 08"
-    }
+    },
+
+   "dimensionamento_carga_p9_launcher": {
+    keywords: ["monofásico", "bifásico", "trifásico", "kW", "carga"],
+    fase: "INSTALAÇÕES E INFRAESTRUTURA URBANA",
+    titulo: "Tipos de Ligação e Carga (Pág 9)",
+    icone: "settings_input_component",
+    resumo: "Calculadora interativa para determinar o tipo de fornecimento com base na carga total.",
+    html_content: `
+        <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 40px; background: #f4f7f6; border-radius: 15px; border: 2px dashed #9b59b6; text-align: center;">
+            <div style="font-size: 50px; margin-bottom: 20px;">🧮</div>
+            <h3 style="color: #2c3e50; margin-bottom: 10px;">Calculadora de Fornecimento</h3>
+            <p style="color: #7f8c8d; max-width: 400px; margin-bottom: 25px;">
+                Determine se a edificação exige entrada Monofásica, Bifásica ou Trifásica com base na carga em kW.
+            </p>
+            <div style="text-align:center; padding:20px;">
+                <button onclick="window.loadSimulatorPage('pagina_nove')" 
+                        style="padding:15px 30px; cursor:pointer; background:#9b59b6; color:white; border:none; border-radius:5px; font-weight:bold; transition: 0.3s;">
+                    Abrir Dimensionamento (Pág 9)
+                </button>
+            </div>
+        </div>
+    `,
+    pagina: "Aula 01 - Pág 09"
+}
 });
